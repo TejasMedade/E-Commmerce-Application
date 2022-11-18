@@ -1,4 +1,4 @@
-# Online-Shopping-System
+# E Commerce Application
  
 README PENDING
 API FLOW PENDING
@@ -10,7 +10,7 @@ API REFERNCE
 ![Logo](https://nimbus-screenshots.s3.amazonaws.com/s/91e455fba18e9a844446391993ef3a15.png)
 
 
-# Online Shopping System
+# E Commerce Application
 
  **REST API SERVICE**
 
