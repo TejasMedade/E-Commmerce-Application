@@ -18,6 +18,7 @@ public class ResourceNotFoundException extends Exception {
 	String resourceName;
 	String fieldName;
 	String fieldValue;
+	Integer fieldValue2;
 
 	/**
 	 * @param resourceName
@@ -25,11 +26,18 @@ public class ResourceNotFoundException extends Exception {
 	 * @param userId
 	 */
 
-	public ResourceNotFoundException(String resourceName, String fieldName, String userId) {
-		super(String.format("%s Not Found With This %s : %s", resourceName, fieldName, userId));
+	public ResourceNotFoundException(String resourceName, String fieldName, String fieldValue) {
+		super(String.format("%s Not Found With This %s : %s", resourceName, fieldName, fieldValue));
 		this.resourceName = resourceName;
 		this.fieldName = fieldName;
-		this.fieldValue = userId;
+		this.fieldValue = fieldValue;
+	}
+
+	public ResourceNotFoundException(String resourceName, String fieldName, Integer fieldValue2) {
+		super(String.format("%s Not Found With This %s : %s", resourceName, fieldName, fieldValue2));
+		this.resourceName = resourceName;
+		this.fieldName = fieldName;
+		this.fieldValue2 = fieldValue2;
 	}
 
 }
