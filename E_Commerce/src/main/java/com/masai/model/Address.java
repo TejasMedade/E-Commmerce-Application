@@ -31,6 +31,8 @@ public class Address {
 	
 	private String addressLine2;
 	
+	private String buildingName;
+
 	private String landMark;
 	
 	private String city;
@@ -41,6 +43,5 @@ public class Address {
 	
 	private String pincode;
 
-	
 	
 }
