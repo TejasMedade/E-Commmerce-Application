@@ -5,7 +5,6 @@ package com.masai.modelResponseDto;
 
 import java.time.LocalDate;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,10 +28,10 @@ public class CustomerResponseDto {
 
 	private String email;
 
-	private Integer addressId;
-	
 	private LocalDate dateOfBirth;
 
-	private AddressResponseDto addressResponseDto;
+	private LocalDate accountCreatedDate;
+
+	private AddressResponseDto address;
 
 }

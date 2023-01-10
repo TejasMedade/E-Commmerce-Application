@@ -1,38 +1,28 @@
-/**
- * 
- */
-package com.masai.modelResponseDto;
+package com.masai.modelRequestDto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * @author tejas
- *
- */
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddressResponseDto {
+public class AddressUpdateRequestDto {
 
-private Integer addressId;
-	
 	private String addressLine1;
-	
+
 	private String addressLine2;
-	
+
 	private String buildingName;
 
 	private String landMark;
-	
+
 	private String city;
-	
+
 	private String state;
-	
+
 	private String country;
-	
+
 	private String pincode;
 
 }
