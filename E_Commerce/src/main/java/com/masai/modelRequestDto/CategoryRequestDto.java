@@ -38,7 +38,6 @@ public class CategoryRequestDto {
 	@NotEmpty(message = "{Category.description.invalid}")
 	@NotNull(message = "{Category.description.invalid}")
 	@NotBlank(message = "{Category.description.invalid}")
-	@Column(length = Integer.MAX_VALUE)
 	private String categoryDescription;
 	
 	@NotNull(message = "Category Should be Active or InActive")
