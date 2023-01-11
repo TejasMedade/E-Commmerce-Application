@@ -27,7 +27,6 @@ public class ProductRequestDto {
 	@NotNull(message = "{Product.description.invalid}")
 	@NotBlank(message = "{Product.description.invalid}")
 	@NotEmpty(message = "{Product.description.invalid}")
-	@Column(length = Integer.MAX_VALUE)
 	private String productDescription;
 
 	@NotNull(message = "{Product.brand.invalid}")
