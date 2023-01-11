@@ -20,14 +20,14 @@ import com.masai.modelResponseDto.CustomerDetailsResponseDto;
 import com.masai.modelResponseDto.CustomerResponseDto;
 import com.masai.payloads.ApiResponse;
 import com.masai.repositories.CustomerRepo;
-import com.masai.services.CustomerService;
+import com.masai.services.CustomerServices;
 
 /**
  * @author tejas
  *
  */
 @Service
-public class CustomerServiceImplementation implements CustomerService {
+public class CustomerServiceImplementation implements CustomerServices {
 
 	@Autowired
 	private ModelMapper modelMapper;
