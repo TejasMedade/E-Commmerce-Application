@@ -27,7 +27,7 @@ import com.masai.services.AddressServices;
  *
  */
 @RestController
-@RequestMapping("bestbuy/address")
+@RequestMapping("bestbuy/addresses")
 public class AddressController {
 
 	@Autowired
