@@ -33,7 +33,7 @@ import com.masai.services.CustomerServices;
  */
 
 @RestController
-@RequestMapping("bestbuy/customer")
+@RequestMapping("bestbuy/customers")
 public class CustomerController {
 
 	@Autowired
