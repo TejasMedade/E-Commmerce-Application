@@ -27,7 +27,7 @@ import com.masai.services.AddressServices;
  *
  */
 @RestController
-@RequestMapping("bestbuy/addresses")
+@RequestMapping("bestbuy/address")
 public class AddressController {
 
 	@Autowired
@@ -43,12 +43,12 @@ public class AddressController {
 	}
 
 	@PostMapping("/{contact}")
-	public ResponseEntity<AddressResponseDto> addAddressDetailsHandler(@PathVariable("contact") String customerContact,
+	public ResponseEntity<CustomerResponseDto> addAddressDetailsHandler(@PathVariable("contact") String customerContact,
 			@Valid @RequestBody AddressRequestDto addressRequestDto) throws ResourceNotFoundException {
 
-		AddressResponseDto addressDetails = this.addressServices.getAddressDetails(customerContact);
+		CustomerResponseDto customerResponseDto = this.addressServices.addAddressDetails(customerContact,addressRequestDto);
 
-		return new ResponseEntity<AddressResponseDto>(addressDetails, HttpStatus.OK);
+		return new ResponseEntity<CustomerResponseDto>(customerResponseDto, HttpStatus.ACCEPTED);
 	}
 
 	@PutMapping("/{contact}")
