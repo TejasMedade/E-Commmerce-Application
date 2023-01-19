@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.masai.exceptions.ResourceNotFoundException;
 import com.masai.modelRequestDto.CategoryRequestDto;
+import com.masai.modelRequestDto.CategoryUpdateRequestDto;
 import com.masai.modelResponseDto.CategoryResponseDto;
 import com.masai.payloads.ApiResponse;
 import com.masai.payloads.AppConstants;
@@ -39,7 +40,7 @@ public class CategoryController {
 	private CategoryServices categoryServices;
 
 	@GetMapping("/all")
-	public ResponseEntity<List<CategoryResponseDto>> getAllCategories() {
+	public ResponseEntity<List<CategoryResponseDto>> getAllCategoriesHandler() {
 
 		List<CategoryResponseDto> allCategories = this.categoryServices.getAllCategories();
 
@@ -47,7 +48,7 @@ public class CategoryController {
 	}
 
 	@PostMapping("/")
-	public ResponseEntity<CategoryResponseDto> addCategory(@Valid @RequestBody CategoryRequestDto categoryRequestDto) {
+	public ResponseEntity<CategoryResponseDto> addCategoryHandler(@Valid @RequestBody CategoryRequestDto categoryRequestDto) {
 
 		CategoryResponseDto category = this.categoryServices.addCategory(categoryRequestDto);
 
@@ -55,8 +56,8 @@ public class CategoryController {
 	}
 
 	@PutMapping("/{categoryId}")
-	public ResponseEntity<CategoryResponseDto> updateCategory(@PathVariable("categoryId") Integer categoryId,
-			@Valid @RequestBody CategoryRequestDto categoryRequestDto) throws ResourceNotFoundException {
+	public ResponseEntity<CategoryResponseDto> updateCategoryHandler(@PathVariable("categoryId") Integer categoryId,
+			@Valid @RequestBody CategoryUpdateRequestDto categoryRequestDto) throws ResourceNotFoundException {
 
 		CategoryResponseDto updatedCategory = this.categoryServices.updateCategory(categoryId, categoryRequestDto);
 
@@ -64,7 +65,7 @@ public class CategoryController {
 	}
 
 	@DeleteMapping("/{categoryId}")
-	public ResponseEntity<ApiResponse> deleteCategoryById(@PathVariable("categoryId") Integer categoryId)
+	public ResponseEntity<ApiResponse> deleteCategoryByIdHandler(@PathVariable("categoryId") Integer categoryId)
 			throws ResourceNotFoundException {
 
 		ApiResponse apiResponse = this.categoryServices.deleteCategoryById(categoryId);
@@ -73,7 +74,7 @@ public class CategoryController {
 	}
 
 	@GetMapping("/{categoryId}")
-	public ResponseEntity<CategoryResponseDto> getCategory(@PathVariable("categoryId") Integer categoryId)
+	public ResponseEntity<CategoryResponseDto> getCategoryHandler(@PathVariable("categoryId") Integer categoryId)
 			throws ResourceNotFoundException {
 
 		CategoryResponseDto category = this.categoryServices.getCategory(categoryId);
@@ -82,7 +83,7 @@ public class CategoryController {
 	}
 
 	@GetMapping("/")
-	public ResponseEntity<PageResponse> getAllCategoriesByPage(
+	public ResponseEntity<PageResponse> getAllCategoriesByPageHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize) {
 
@@ -92,10 +93,10 @@ public class CategoryController {
 	}
 
 	@GetMapping("/sortby")
-	public ResponseEntity<PageResponse> getSortedByAnyCategoryDetailsByPage(
+	public ResponseEntity<PageResponse> getSortedByAnyCategoryDetailsByPageHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
-			@RequestParam(defaultValue = AppConstants.SORTBY, required = false) String sortBy,
+			@RequestParam(defaultValue = AppConstants.CATEGORYSORTBY, required = false) String sortBy,
 			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
 
 		PageResponse categoriesByPage = this.categoryServices.getSortedByAnyCategoryDetailsByPage(pageNumber, pageSize,
@@ -106,7 +107,7 @@ public class CategoryController {
 	}
 
 	@GetMapping("/search/{keyword}")
-	public ResponseEntity<List<CategoryResponseDto>> searchCategoriesByKeyword(
+	public ResponseEntity<List<CategoryResponseDto>> searchCategoriesByKeywordHandler(
 			@PathVariable("keyword") String keyword) {
 
 		List<CategoryResponseDto> categoriesByKeyword = this.categoryServices.searchCategoriesByKeyword(keyword);
