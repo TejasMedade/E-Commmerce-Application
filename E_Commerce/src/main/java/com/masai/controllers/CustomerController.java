@@ -84,4 +84,31 @@ public class CustomerController {
 
 		return new ResponseEntity<CustomerResponseDto>(customer, HttpStatus.FOUND);
 	}
+
+	@GetMapping("/{firstname}")
+	public ResponseEntity<List<CustomerResponseDto>> searchByfirstName(@PathVariable("firstname") String firstName) {
+
+		List<CustomerResponseDto> searchByfirstName = this.customerService.searchByfirstName(firstName);
+
+		return new ResponseEntity<List<CustomerResponseDto>>(searchByfirstName, HttpStatus.FOUND);
+
+	}
+
+	@GetMapping("/{lastname}")
+	public ResponseEntity<List<CustomerResponseDto>> searchBylastName(@PathVariable("lastname") String lastName) {
+
+		List<CustomerResponseDto> searchBylastName = this.customerService.searchBylastName(lastName);
+
+		return new ResponseEntity<List<CustomerResponseDto>>(searchBylastName, HttpStatus.FOUND);
+	}
+
+	@GetMapping("/{email}")
+	public ResponseEntity<List<CustomerResponseDto>> searchByemailId(@PathVariable("email") String email) {
+
+		List<CustomerResponseDto> searchByemailId = this.customerService.searchByemailId(email);
+
+		return new ResponseEntity<List<CustomerResponseDto>>(searchByemailId, HttpStatus.FOUND);
+
+	}
+
 }
