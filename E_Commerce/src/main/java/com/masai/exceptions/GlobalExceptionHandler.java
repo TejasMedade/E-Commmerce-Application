@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.dao.DataIntegrityViolationException;
 
 /**
  * @author tejas
@@ -50,19 +49,34 @@ public class GlobalExceptionHandler {
 		return new ResponseEntity<MyErrorDetails>(err, HttpStatus.NOT_FOUND);
 
 	}
-	//Delete Later
-	// DataIntegrityViolation Exception
-	@ExceptionHandler(DataIntegrityViolationException.class)
-	public ResponseEntity<MyErrorDetails> DataIntegrityViolationException(Exception se, WebRequest req) {
+	
+	
+	// ResourceNotAllowedException Exception
+	@ExceptionHandler(ResourceNotAllowedException.class)
+	public ResponseEntity<MyErrorDetails> ResourceNotAllowedExceptionHandler(Exception se, WebRequest req) {
 
 		MyErrorDetails err = new MyErrorDetails();
 		err.setTimestamp(LocalDateTime.now());
-		err.setMessage("Customer Already Exists With This Contact Number !");
+		err.setMessage(se.getMessage());
 		err.setDescription(req.getDescription(false));
 
 		return new ResponseEntity<MyErrorDetails>(err, HttpStatus.NOT_FOUND);
 
 	}
+	
+	// DuplicateResourceException Exception
+	@ExceptionHandler(DuplicateResourceException.class)
+	public ResponseEntity<MyErrorDetails> DuplicateResourceExceptionHandler(Exception se, WebRequest req) {
+
+		MyErrorDetails err = new MyErrorDetails();
+		err.setTimestamp(LocalDateTime.now());
+		err.setMessage(se.getMessage());
+		err.setDescription(req.getDescription(false));
+
+		return new ResponseEntity<MyErrorDetails>(err, HttpStatus.NOT_FOUND);
+
+	}
+
 
 	// Validation Exception
 	@ExceptionHandler(MethodArgumentNotValidException.class)
