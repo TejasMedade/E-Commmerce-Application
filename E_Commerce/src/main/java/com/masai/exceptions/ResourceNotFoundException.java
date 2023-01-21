@@ -39,5 +39,10 @@ public class ResourceNotFoundException extends Exception {
 		this.fieldName = fieldName;
 		this.fieldValue2 = fieldValue2;
 	}
-
+	
+	public ResourceNotFoundException( String fieldName) {
+		super(String.format("%s is Empty !", fieldName));
+		this.fieldName = fieldName;
+	}
+	
 }
