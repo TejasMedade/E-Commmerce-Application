@@ -3,6 +3,7 @@
  */
 package com.masai.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.masai.exceptions.FileTypeNotValidException;
 import com.masai.exceptions.ResourceNotAllowedException;
 import com.masai.exceptions.ResourceNotFoundException;
 import com.masai.modelRequestDto.ProductRequestDto;
@@ -40,6 +44,9 @@ public class ProductController {
 
 	@Autowired
 	private ProductServices productServices;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@GetMapping("/all")
 	public ResponseEntity<List<ProductResponseDto>> getAllProductsHandler() {
@@ -193,10 +200,13 @@ public class ProductController {
 
 	@PostMapping("/{categoryId}")
 	public ResponseEntity<ProductResponseDto> addProductHandler(@PathVariable("categoryId") Integer categoryId,
-			@Valid @RequestBody ProductRequestDto productRequestDto)
-			throws ResourceNotFoundException, ResourceNotAllowedException {
+			@Valid @RequestParam String productRequestDto, @RequestParam MultipartFile[] images)
+			throws ResourceNotFoundException, ResourceNotAllowedException, IOException, FileTypeNotValidException {
 
-		ProductResponseDto product = this.productServices.addProduct(categoryId, productRequestDto);
+		// converting String into JSON
+		ProductRequestDto productrequestDto = objectMapper.readValue(productRequestDto, ProductRequestDto.class);
+
+		ProductResponseDto product = this.productServices.addProduct(categoryId, productrequestDto, images);
 
 		return new ResponseEntity<ProductResponseDto>(product, HttpStatus.ACCEPTED);
 	}
