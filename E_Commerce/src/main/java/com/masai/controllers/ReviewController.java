@@ -3,21 +3,32 @@
  */
 package com.masai.controllers;
 
+import java.io.IOException;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.masai.exceptions.FileTypeNotValidException;
+import com.masai.exceptions.ResourceNotAllowedException;
 import com.masai.exceptions.ResourceNotFoundException;
 import com.masai.modelRequestDto.ReviewRequestDto;
 import com.masai.modelResponseDto.ReviewResponseDto;
+import com.masai.payloads.ApiResponse;
 import com.masai.payloads.AppConstants;
 import com.masai.payloads.PageResponse;
 import com.masai.services.ReviewServices;
@@ -32,6 +43,9 @@ public class ReviewController {
 
 	@Autowired
 	private ReviewServices reviewServices;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 
 	@GetMapping("/products/{productId}")
 	public ResponseEntity<List<ReviewResponseDto>> getReviewsByProduct(@PathVariable("productId") Integer productId)
@@ -53,12 +67,25 @@ public class ReviewController {
 
 	@PostMapping("/products/{productId}/customers/{contact}")
 	public ResponseEntity<ReviewResponseDto> addReview(@PathVariable("contact") String contact,
-			@PathVariable("productId") Integer productId, ReviewRequestDto reviewRequestDto)
-			throws ResourceNotFoundException {
+			@PathVariable("productId") Integer productId, @Valid @RequestParam String reviewRequestDto,
+			@RequestParam(required = false) MultipartFile[] images)
+			throws ResourceNotFoundException, ResourceNotAllowedException, IOException, FileTypeNotValidException {
 
-		ReviewResponseDto reviewResponseDto = this.reviewServices.addReview(contact, productId, reviewRequestDto);
+		// converting String into JSON
+		ReviewRequestDto review = objectMapper.readValue(reviewRequestDto, ReviewRequestDto.class);
 
-		return new ResponseEntity<ReviewResponseDto>(reviewResponseDto, HttpStatus.ACCEPTED);
+		if (images.length == 0) {
+			ReviewResponseDto reviewResponseDto = this.reviewServices.addReview(contact, productId, review);
+
+			return new ResponseEntity<ReviewResponseDto>(reviewResponseDto, HttpStatus.ACCEPTED);
+		} else {
+
+			ReviewResponseDto reviewResponseDto = this.reviewServices.addReviewWithImages(contact, productId, review,
+					images);
+
+			return new ResponseEntity<ReviewResponseDto>(reviewResponseDto, HttpStatus.ACCEPTED);
+		}
+
 	}
 
 	@GetMapping("/dates/products/{productId}")
@@ -97,6 +124,24 @@ public class ReviewController {
 				sortDirection);
 
 		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
+	}
+
+	// method to serve images
+	@GetMapping(value = "/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+	public void serveImageHandler(@PathVariable("imageName") String imageName, HttpServletResponse response)
+			throws IOException, ResourceNotFoundException, FileTypeNotValidException {
+
+		this.reviewServices.serveReviewImage(imageName, response);
+
+	}
+
+	// method to delete images
+	@DeleteMapping("/images/{fileName}")
+	public ResponseEntity<ApiResponse> deleteImage(@PathVariable("fileName") String fileName) throws IOException {
+
+		ApiResponse apiResponse = this.reviewServices.deleteReviewImage(fileName);
+
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 
 }
