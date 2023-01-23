@@ -6,10 +6,12 @@ package com.masai.controllers;
 import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -100,19 +102,19 @@ public class ProductController {
 		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
 	}
 
-	@GetMapping("/filter/category/{categoryId}/sort/addeddate")
-	public ResponseEntity<PageResponse> findByCategorySortByProductAddedDate(
-			@PathVariable("categoryId") Integer categoryId,
-			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
-			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
-			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
-			throws ResourceNotFoundException {
-
-		PageResponse pageResponse = this.productServices.findByCategorySortByProductAddedDate(categoryId, pageNumber,
-				pageSize, sortDirection);
-
-		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
-	}
+//	@GetMapping("/filter/category/{categoryId}/sort/addeddate")
+//	public ResponseEntity<PageResponse> findByCategorySortByProductAddedDate(
+//			@PathVariable("categoryId") Integer categoryId,
+//			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+//			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+//			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
+//			throws ResourceNotFoundException {
+//
+//		PageResponse pageResponse = this.productServices.findByCategorySortByProductAddedDate(categoryId, pageNumber,
+//				pageSize, sortDirection);
+//
+//		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
+//	}
 
 	@GetMapping("/sort/price")
 	public ResponseEntity<PageResponse> getSortedProductsBySalePriceHandler(
@@ -240,6 +242,16 @@ public class ProductController {
 
 	}
 
+	@PutMapping("/images/{productId}")
+	public ResponseEntity<ProductResponseDto> updateProductImage(@RequestParam MultipartFile[] images,
+			@PathVariable("productId") Integer productId)
+			throws ResourceNotFoundException, IOException, FileTypeNotValidException {
+
+		ProductResponseDto updateProductImage = this.productServices.updateProductImage(images, productId);
+
+		return new ResponseEntity<ProductResponseDto>(updateProductImage, HttpStatus.OK);
+	}
+
 	@PutMapping("/{productId}/available")
 	public ResponseEntity<ProductResponseDto> revokeAvailability(@PathVariable("productId") Integer productId)
 			throws ResourceNotFoundException {
@@ -263,6 +275,34 @@ public class ProductController {
 			throws ResourceNotFoundException {
 
 		ApiResponse apiResponse = this.productServices.deleteProductById(productId);
+
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
+	}
+
+	// method to serve images
+	@GetMapping(value = "/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+	public void serveImageHandler(@PathVariable("imageName") String imageName, HttpServletResponse response)
+			throws IOException, ResourceNotFoundException, FileTypeNotValidException {
+
+		this.productServices.serveProductImage(imageName, response);
+
+	}
+
+	// method to serve images
+	@GetMapping(value = "{productId}/images")
+	public ResponseEntity<ApiResponse> serveImageHandler(@PathVariable("productId") Integer productId)
+			throws IOException, ResourceNotFoundException {
+
+		ApiResponse apiResponse = this.productServices.serveImageByProductId(productId);
+
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
+	}
+
+	// method to delete images
+	@DeleteMapping("/images/{fileName}")
+	public ResponseEntity<ApiResponse> deleteImage(@PathVariable("fileName") String fileName) throws IOException {
+
+		ApiResponse apiResponse = this.productServices.deleteProductImage(fileName);
 
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
