@@ -3,12 +3,15 @@
  */
 package com.masai.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +21,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.masai.exceptions.FileTypeNotValidException;
 import com.masai.exceptions.ResourceNotFoundException;
 import com.masai.modelRequestDto.CustomerRequestDto;
 import com.masai.modelRequestDto.CustomerUpdateRequestDto;
@@ -48,7 +53,16 @@ public class CustomerController {
 		return new ResponseEntity<CustomerDetailsResponseDto>(signUpCustomer, HttpStatus.ACCEPTED);
 	}
 
-	@PutMapping("/update/{contact}")
+	@PutMapping("/{contact}/image")
+	public ResponseEntity<CustomerDetailsResponseDto> updateCustomerImage(String contact, MultipartFile image)
+			throws ResourceNotFoundException, IOException, FileTypeNotValidException {
+
+		CustomerDetailsResponseDto updateCustomerImage = this.customerService.updateCustomerImage(contact, image);
+
+		return new ResponseEntity<CustomerDetailsResponseDto>(updateCustomerImage, HttpStatus.ACCEPTED);
+	}
+
+	@PutMapping("/{contact}")
 	public ResponseEntity<CustomerDetailsResponseDto> updateCustomerDetailsHandler(
 			@PathVariable("contact") String contact,
 			@Valid @RequestBody CustomerUpdateRequestDto customerUpdateRequestDto) throws ResourceNotFoundException {
@@ -111,4 +125,21 @@ public class CustomerController {
 
 	}
 
+	// method to serve images
+	@GetMapping(value = "/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+	public void serveImageHandler(@PathVariable("imageName") String imageName, HttpServletResponse response)
+			throws IOException, ResourceNotFoundException, FileTypeNotValidException {
+
+		this.customerService.serveCustomerImage(imageName, response);
+
+	}
+
+	// method to delete images
+	@DeleteMapping("/images/{fileName}")
+	public ResponseEntity<ApiResponse> deleteImage(@PathVariable("fileName") String fileName) throws IOException {
+
+		ApiResponse apiResponse = this.customerService.deleteCustomerImage(fileName);
+
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
+	}
 }
