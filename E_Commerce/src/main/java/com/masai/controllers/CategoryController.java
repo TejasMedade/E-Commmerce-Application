@@ -55,7 +55,7 @@ public class CategoryController {
 		return new ResponseEntity<CategoryResponseDto>(category, HttpStatus.ACCEPTED);
 	}
 
-	@PutMapping("/{categoryId}")
+	@PutMapping("/{categoryId}/update")
 	public ResponseEntity<CategoryResponseDto> updateCategoryHandler(@PathVariable("categoryId") Integer categoryId,
 			@Valid @RequestBody CategoryUpdateRequestDto categoryRequestDto) throws ResourceNotFoundException {
 
@@ -64,7 +64,7 @@ public class CategoryController {
 		return new ResponseEntity<CategoryResponseDto>(updatedCategory, HttpStatus.ACCEPTED);
 	}
 
-	@DeleteMapping("/{categoryId}")
+	@DeleteMapping("/{categoryId}/delete")
 	public ResponseEntity<ApiResponse> deleteCategoryByIdHandler(@PathVariable("categoryId") Integer categoryId)
 			throws ResourceNotFoundException {
 
@@ -82,7 +82,7 @@ public class CategoryController {
 		return new ResponseEntity<CategoryResponseDto>(category, HttpStatus.FOUND);
 	}
 
-	@GetMapping("/")
+	@GetMapping("/all/page")
 	public ResponseEntity<PageResponse> getAllCategoriesByPageHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize) {
@@ -92,7 +92,7 @@ public class CategoryController {
 		return new ResponseEntity<PageResponse>(categoriesByPage, HttpStatus.OK);
 	}
 
-	@GetMapping("/sortby")
+	@GetMapping("/all/sortby")
 	public ResponseEntity<PageResponse> getSortedByAnyCategoryDetailsByPageHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
@@ -106,7 +106,7 @@ public class CategoryController {
 
 	}
 
-	@GetMapping("/search/{keyword}")
+	@GetMapping("/all/search/{keyword}")
 	public ResponseEntity<List<CategoryResponseDto>> searchCategoriesByKeywordHandler(
 			@PathVariable("keyword") String keyword) {
 
