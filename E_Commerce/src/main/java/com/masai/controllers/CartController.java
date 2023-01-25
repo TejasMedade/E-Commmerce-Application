@@ -29,7 +29,7 @@ import com.masai.services.CartServices;
  *
  */
 @RestController
-@RequestMapping("bestbuy/carts")
+@RequestMapping("/bestbuy/carts")
 public class CartController {
 
 	@Autowired
