@@ -16,7 +16,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.masai.exceptions.FileTypeNotValidException;
 import com.masai.exceptions.ResourceNotFoundException;
-import com.masai.modelRequestDto.CustomerRequestDto;
 import com.masai.modelRequestDto.CustomerUpdateRequestDto;
 import com.masai.modelResponseDto.CustomerDetailsResponseDto;
 import com.masai.modelResponseDto.CustomerResponseDto;
@@ -38,20 +36,11 @@ import com.masai.services.CustomerServices;
  */
 
 @RestController
-@RequestMapping("bestbuy/customers")
+@RequestMapping("/bestbuy/customers")
 public class CustomerController {
 
 	@Autowired
 	private CustomerServices customerService;
-
-	@PostMapping("/")
-	public ResponseEntity<CustomerDetailsResponseDto> signUpCustomerHandler(
-			@Valid @RequestBody CustomerRequestDto customerRequestDto) {
-
-		CustomerDetailsResponseDto signUpCustomer = this.customerService.signUpCustomer(customerRequestDto);
-
-		return new ResponseEntity<CustomerDetailsResponseDto>(signUpCustomer, HttpStatus.ACCEPTED);
-	}
 
 	@PutMapping("/{contact}/image")
 	public ResponseEntity<CustomerDetailsResponseDto> updateCustomerImage(String contact, MultipartFile image)
@@ -62,7 +51,7 @@ public class CustomerController {
 		return new ResponseEntity<CustomerDetailsResponseDto>(updateCustomerImage, HttpStatus.ACCEPTED);
 	}
 
-	@PutMapping("/{contact}")
+	@PutMapping("/{contact}/update")
 	public ResponseEntity<CustomerDetailsResponseDto> updateCustomerDetailsHandler(
 			@PathVariable("contact") String contact,
 			@Valid @RequestBody CustomerUpdateRequestDto customerUpdateRequestDto) throws ResourceNotFoundException {
@@ -73,7 +62,7 @@ public class CustomerController {
 		return new ResponseEntity<CustomerDetailsResponseDto>(updateCustomerDetails, HttpStatus.ACCEPTED);
 	}
 
-	@DeleteMapping("/delete/{contact}")
+	@DeleteMapping("/{contact}/delete")
 	public ResponseEntity<ApiResponse> deleteCustomerAccountHandler(@PathVariable("contact") String contact)
 			throws ResourceNotFoundException {
 
@@ -117,7 +106,7 @@ public class CustomerController {
 	}
 
 	@GetMapping("/{email}")
-	public ResponseEntity<List<CustomerResponseDto>> searchByemailId(@PathVariable("email") String email) {
+	public ResponseEntity<List<CustomerResponseDto>> searchByEmailId(@PathVariable("email") String email) {
 
 		List<CustomerResponseDto> searchByemailId = this.customerService.searchByemailId(email);
 
@@ -126,7 +115,7 @@ public class CustomerController {
 	}
 
 	// method to serve images
-	@GetMapping(value = "/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+	@GetMapping(value = "/images/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
 	public void serveImageHandler(@PathVariable("imageName") String imageName, HttpServletResponse response)
 			throws IOException, ResourceNotFoundException, FileTypeNotValidException {
 
@@ -135,10 +124,10 @@ public class CustomerController {
 	}
 
 	// method to delete images
-	@DeleteMapping("/images/{fileName}")
-	public ResponseEntity<ApiResponse> deleteImage(@PathVariable("fileName") String fileName) throws IOException {
+	@DeleteMapping("/images/{imageName}/delete")
+	public ResponseEntity<ApiResponse> deleteImage(@PathVariable("imageName") String imageName) throws IOException {
 
-		ApiResponse apiResponse = this.customerService.deleteCustomerImage(fileName);
+		ApiResponse apiResponse = this.customerService.deleteCustomerImage(imageName);
 
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
