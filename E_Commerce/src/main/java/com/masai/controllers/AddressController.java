@@ -27,13 +27,13 @@ import com.masai.services.AddressServices;
  *
  */
 @RestController
-@RequestMapping("bestbuy/address")
+@RequestMapping("/bestbuy/address")
 public class AddressController {
 
 	@Autowired
 	private AddressServices addressServices;
 
-	@GetMapping("/{contact}")
+	@GetMapping("/customers/{contact}")
 	public ResponseEntity<AddressResponseDto> getAddressDetailsHandler(@PathVariable("contact") String customerContact)
 			throws ResourceNotFoundException {
 
@@ -42,7 +42,7 @@ public class AddressController {
 		return new ResponseEntity<AddressResponseDto>(addressDetails, HttpStatus.OK);
 	}
 
-	@PostMapping("/{contact}")
+	@PostMapping("/customers/{contact}")
 	public ResponseEntity<CustomerResponseDto> addAddressDetailsHandler(@PathVariable("contact") String customerContact,
 			@Valid @RequestBody AddressRequestDto addressRequestDto) throws ResourceNotFoundException {
 
@@ -51,7 +51,7 @@ public class AddressController {
 		return new ResponseEntity<CustomerResponseDto>(customerResponseDto, HttpStatus.ACCEPTED);
 	}
 
-	@PutMapping("/{contact}")
+	@PutMapping("/customers/{contact}")
 	public ResponseEntity<CustomerResponseDto> udpateAddressDetails(@PathVariable("contact") String customerContact,
 			@RequestBody AddressUpdateRequestDto addressUpdateRequestDto) throws ResourceNotFoundException {
 
