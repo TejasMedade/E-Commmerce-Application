@@ -66,7 +66,7 @@ public class OrderController {
 		return new ResponseEntity<List<OrderDetailsResponseDto>>(allOrders, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/{orderId}")
+	@DeleteMapping("admin/{orderId}/delete")
 	public ResponseEntity<ApiResponse> deleteOrder(@PathVariable("orderId") Integer orderId)
 			throws ResourceNotFoundException {
 
@@ -84,7 +84,7 @@ public class OrderController {
 		return new ResponseEntity<OrderDetailsResponseDto>(orderByOrderId, HttpStatus.OK);
 	}
 
-	@PutMapping("/{orderId}/delivered")
+	@PutMapping("admin/{orderId}/delivered")
 	public ResponseEntity<ApiResponse> markDelivered(@PathVariable("orderId") Integer orderId)
 			throws ResourceNotFoundException {
 
@@ -93,7 +93,7 @@ public class OrderController {
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 
-	@PutMapping("/{orderId}/{status}")
+	@PutMapping("admin/{orderId}/{status}")
 	public ResponseEntity<OrderDetailsResponseDto> updateOrderStatus(@PathVariable("orderId") Integer orderId,
 			@PathVariable("status") String status) throws ResourceNotFoundException {
 
@@ -103,7 +103,7 @@ public class OrderController {
 
 	}
 
-	@PostMapping("/cancel/{orderId}")
+	@PostMapping("/{orderId}/cancel")
 	public ResponseEntity<ApiResponse> cancelOrder(@PathVariable("orderId") Integer orderId)
 			throws ResourceNotFoundException, DuplicateResourceException {
 
@@ -112,7 +112,7 @@ public class OrderController {
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 
-	@GetMapping("/refunds/requests/pending")
+	@GetMapping("/admin/refunds/requests/pending")
 	public ResponseEntity<List<RefundOrderDetailsResponseDto>> getAllPendingRefundRequests() {
 
 		List<RefundOrderDetailsResponseDto> pendingRefundRequests = this.orderServices.getAllPendingRefundRequests();
@@ -120,7 +120,7 @@ public class OrderController {
 		return new ResponseEntity<List<RefundOrderDetailsResponseDto>>(pendingRefundRequests, HttpStatus.OK);
 	}
 
-	@GetMapping("/replacements/requests/pending")
+	@GetMapping("/admin/replacements/requests/pending")
 	public ResponseEntity<List<ReplaceOrderDetailsResponseDto>> getAllPendingReplacementRequests() {
 
 		List<ReplaceOrderDetailsResponseDto> allPendingReplacementRequests = this.orderServices
@@ -129,7 +129,7 @@ public class OrderController {
 		return new ResponseEntity<List<ReplaceOrderDetailsResponseDto>>(allPendingReplacementRequests, HttpStatus.OK);
 	}
 	
-	@GetMapping("/replacements/requests/approved")
+	@GetMapping("/admin/replacements/requests/approved")
 	public ResponseEntity<List<ReplaceOrderDetailsResponseDto>> getAllApprovedReplacementRequests(){
 		
 		List<ReplaceOrderDetailsResponseDto> allApprovedReplacementRequests = this.orderServices
@@ -139,7 +139,7 @@ public class OrderController {
 		
 	}
 	
-	@GetMapping("/refunds/requests/approved")
+	@GetMapping("/admin/refunds/requests/approved")
 	public ResponseEntity<List<RefundOrderDetailsResponseDto>> getAllAprovedRefundRequests() {
 
 		List<RefundOrderDetailsResponseDto> approvedRefundRequests = this.orderServices.getAllAprovedRefundRequests();
@@ -147,7 +147,7 @@ public class OrderController {
 		return new ResponseEntity<List<RefundOrderDetailsResponseDto>>(approvedRefundRequests, HttpStatus.OK);
 	}
 
-	@PutMapping("/refunds/{refundId}")
+	@PutMapping("/admin/refunds/{refundId}")
 	public ResponseEntity<RefundOrderResponseDto> approveRefundsById(
 			@PathVariable("refundId") Integer refundOrderRequestId) throws ResourceNotFoundException {
 
@@ -156,7 +156,7 @@ public class OrderController {
 		return new ResponseEntity<RefundOrderResponseDto>(refundOrderResponseDto, HttpStatus.ACCEPTED);
 	}
 
-	@PutMapping("/replacements/requests/{replaceId}/{approvedby}")
+	@PutMapping("/admin/replacements/requests/{replaceId}/{approvedby}")
 	public ResponseEntity<ReturnReplaceOrderResponseDto> approveReplacementRequest(
 			@PathVariable("approvedby") String approvedBy, @PathVariable("replaceId") Integer replaceOrderRequestId)
 			throws ResourceNotAllowedException, Exception {
@@ -167,7 +167,7 @@ public class OrderController {
 		return new ResponseEntity<ReturnReplaceOrderResponseDto>(approveReplacementRequest, HttpStatus.OK);
 	}
 
-	@PostMapping("/return/replace/{orderId}")
+	@PostMapping("/{orderId}/return/replace")
 	public ResponseEntity<ApiResponse> returnforReplacementAndPickupOrder(@PathVariable("orderId") Integer orderId)
 			throws ResourceNotFoundException, DuplicateResourceException {
 
@@ -176,7 +176,7 @@ public class OrderController {
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 
-	@PostMapping("/return/refund/{orderId}")
+	@PostMapping("/{orderId}/return/refund")
 	public ResponseEntity<ApiResponse> returnforRefundAndPickupOrder(@PathVariable("orderId") Integer orderId)
 			throws ResourceNotFoundException, DuplicateResourceException {
 
@@ -186,7 +186,7 @@ public class OrderController {
 
 	}
 
-	@PutMapping("/pickups/requests/{orderId}/{pickedUpBy}")
+	@PutMapping("/admin/pickups/requests/{orderId}/{pickedUpBy}")
 	public ResponseEntity<ApiResponse> revokeOrderPickUpStatus(@PathVariable("pickedUpBy") String pickedUpBy,
 			@PathVariable("orderId") Integer orderId) throws ResourceNotFoundException, DuplicateResourceException {
 
