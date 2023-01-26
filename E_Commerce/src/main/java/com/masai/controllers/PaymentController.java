@@ -54,7 +54,7 @@ public class PaymentController {
 
 	}
 	
-	@GetMapping("/")
+	@GetMapping("/all")
 	public ResponseEntity<List<PaymentResponseDto>> getAllPaymentMethodsHandler()
 			throws ResourceNotFoundException {
 
@@ -64,7 +64,7 @@ public class PaymentController {
 
 	}
 
-	@DeleteMapping("/{paymentId}")
+	@DeleteMapping("/{paymentId}/delete")
 	public ResponseEntity<ApiResponse> deletePaymentMethodHandler(@PathVariable("paymentId") Integer paymentId)
 			throws ResourceNotFoundException {
 
@@ -73,7 +73,7 @@ public class PaymentController {
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 
-	@PutMapping("/{paymentId}")
+	@PutMapping("/{paymentId}/revoke")
 	public ResponseEntity<PaymentResponseDto> revokePaymentMethodHandler(@PathVariable("paymentId") Integer paymentId)
 			throws ResourceNotFoundException {
 
