@@ -7,7 +7,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
@@ -15,9 +15,11 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.IanaLinkRelations;
-import org.springframework.hateoas.Link;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -33,10 +35,15 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.masai.exceptions.FileTypeNotValidException;
 import com.masai.exceptions.ResourceNotFoundException;
+import com.masai.model.Feedback;
+import com.masai.model.OrderProductDetails;
 import com.masai.modelRequestDto.FeedbackRequestDto;
+import com.masai.modelResponseDto.CustomerDetailsResponseDto;
 import com.masai.modelResponseDto.FeedbackResponseDto;
+import com.masai.modelResponseDto.OrderDetailsResponseDto;
 import com.masai.payloads.ApiResponse;
 import com.masai.payloads.AppConstants;
+import com.masai.payloads.FeedbackModelAssembler;
 import com.masai.payloads.PageResponse;
 import com.masai.services.FeedbackServices;
 
@@ -57,22 +64,21 @@ public class FeedbackController {
 	@Value("${project.image}")
 	private String path;
 
-	@PostMapping("/customers/{contact}/orders/delievered/{orderId}")
+	@Autowired
+	private FeedbackModelAssembler feedbackModelAssembler;
+
+	@Autowired
+	private PagedResourcesAssembler<Feedback> pagedResourcesAssembler;
+
+	@PostMapping("/customers/{contact}/orders/{orderId}/deliever")
 	public ResponseEntity<FeedbackResponseDto> addFeedbackForDeliveredOrder(@PathVariable("contact") String contact,
 			@PathVariable("orderId") Integer orderId, @Valid @RequestParam String feedbackRequestDto,
 			@RequestParam(required = false) MultipartFile image)
 			throws ResourceNotFoundException, IOException, FileTypeNotValidException {
 
-		// converting String into JSON
-		FeedbackRequestDto feedback = objectMapper.readValue(feedbackRequestDto, FeedbackRequestDto.class);
-
-		FeedbackResponseDto feedbackResponseDto = this.feedbackServices.addFeedbackForDeliveredOrder(contact, orderId,
-				feedback, image);
-
-		return new ResponseEntity<FeedbackResponseDto>(feedbackResponseDto, HttpStatus.ACCEPTED);
 	}
 
-	@PostMapping("/customers/{contact}/orders/cancelled/{orderId}")
+	@PostMapping("/customers/{contact}/orders/{orderId}/cancel")
 	public ResponseEntity<FeedbackResponseDto> addFeedbackForCancelledOrder(@PathVariable("contact") String contact,
 			@PathVariable("orderId") Integer orderId, @Valid @RequestParam String feedbackRequestDto,
 			@RequestParam(required = false) MultipartFile image)
@@ -97,28 +103,49 @@ public class FeedbackController {
 
 	}
 
-	@PostMapping("/customers/{contact}/orders/replacements/{orderId}")
+	@PostMapping("/customers/{contact}/orders/{orderId}/replace")
 	public ResponseEntity<FeedbackResponseDto> addFeedbackForReplacementOrder(@PathVariable("contact") String contact,
 			@PathVariable("orderId") Integer orderId, @Valid @RequestParam String feedbackRequestDto,
 			@RequestParam(required = false) MultipartFile image)
 			throws ResourceNotFoundException, IOException, FileTypeNotValidException {
 
-		// converting String into JSON
-		FeedbackRequestDto feedback = objectMapper.readValue(feedbackRequestDto, FeedbackRequestDto.class);
-
-		FeedbackResponseDto feedbackResponseDto = this.feedbackServices.addFeedbackForReplacementOrder(contact, orderId,
-				feedback, image);
-
-		return new ResponseEntity<FeedbackResponseDto>(feedbackResponseDto, HttpStatus.ACCEPTED);
 	}
 
 	@GetMapping("/customers/{contact}")
 	public ResponseEntity<List<FeedbackResponseDto>> getFeedbacksByCustomer(@PathVariable("contact") String contact)
 			throws ResourceNotFoundException {
 
-		List<FeedbackResponseDto> feedbacksByCustomer = this.feedbackServices.getFeedbacksByCustomer(contact);
+		List<FeedbackResponseDto> list = this.feedbackServices.getFeedbacksByCustomer(contact);
 
-		return new ResponseEntity<List<FeedbackResponseDto>>(feedbacksByCustomer, HttpStatus.OK);
+		for (FeedbackResponseDto feedbackResponseDto : list) {
+
+			// Self Link
+			feedbackResponseDto
+					.add(linkTo(methodOn(FeedbackController.class).getFeedbacksByCustomer(contact)).withSelfRel());
+
+			// Collection Link
+			feedbackResponseDto.add(linkTo(methodOn(FeedbackController.class).getallFeedbacks(0, 1))
+					.withRel(IanaLinkRelations.COLLECTION));
+
+			// Customer Link
+			CustomerDetailsResponseDto customer = feedbackResponseDto.getCustomer();
+
+			customer.add(linkTo(methodOn(CustomerController.class)
+					.getCustomerHandler(feedbackResponseDto.getCustomer().getContact())).withRel("customer"));
+
+			feedbackResponseDto.setCustomer(customer);
+
+			// Order Link
+			OrderDetailsResponseDto order = feedbackResponseDto.getOrder();
+
+			order.add(linkTo(methodOn(OrderController.class).getOrderById(feedbackResponseDto.getOrder().getOrderId()))
+					.withRel("order"));
+
+			feedbackResponseDto.setOrder(order);
+
+		}
+
+		return new ResponseEntity<List<FeedbackResponseDto>>(list, HttpStatus.OK);
 	}
 
 	@GetMapping("/orders/{orderId}")
@@ -127,40 +154,119 @@ public class FeedbackController {
 
 		FeedbackResponseDto feedbackResponseDto = this.feedbackServices.getFeedbacksByOrder(orderId);
 
+		// Self Link
 		feedbackResponseDto.add(linkTo(methodOn(FeedbackController.class).getFeedbacksByOrder(orderId)).withSelfRel());
-//		feedbackResponseDto.add(linkTo(methodOn(OrderController.class).getOrderById(orderId)).)
 
-		// Link for Order
-		// Link for all Feedback
+		// Collection Link
+		feedbackResponseDto.add(
+				linkTo(methodOn(FeedbackController.class).getallFeedbacks(0, 1)).withRel(IanaLinkRelations.COLLECTION));
+
+		// Customer Link
+		CustomerDetailsResponseDto customer = feedbackResponseDto.getCustomer();
+
+		customer.add(linkTo(
+				methodOn(CustomerController.class).getCustomerHandler(feedbackResponseDto.getCustomer().getContact()))
+				.withRel("customer"));
+
+		feedbackResponseDto.setCustomer(customer);
+
+		// Order Link
+		OrderDetailsResponseDto order = feedbackResponseDto.getOrder();
+
+		order.add(linkTo(methodOn(OrderController.class).getOrderById(feedbackResponseDto.getOrder().getOrderId()))
+				.withRel("order"));
+
+		List<OrderProductDetails> listOfProducts = feedbackResponseDto.getOrder().getListOfProducts();
+
+		for (OrderProductDetails o : listOfProducts) {
+
+			o.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(o.getProductId())).withSelfRel());
+
+		}
+
+		order.setListOfProducts(listOfProducts);
+		feedbackResponseDto.setOrder(order);
 
 		return new ResponseEntity<FeedbackResponseDto>(feedbackResponseDto, HttpStatus.OK);
 	}
 
-	@GetMapping("/ratings")
-	public ResponseEntity<PageResponse> getFeedbacksByRating(
+	@GetMapping("/sortby/ratings")
+	public ResponseEntity<CollectionModel<FeedbackResponseDto>> getFeedbacksByRating(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
-			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection) {
+			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
+			throws ResourceNotFoundException {
 
-		PageResponse pageResponse = this.feedbackServices.getFeedbacksByRating(pageNumber, pageSize, sortDirection);
+		Page<Feedback> pageResponse = this.feedbackServices.getFeedbacksByRating(pageNumber, pageSize, sortDirection);
 
-		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
+		PagedModel<FeedbackResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, feedbackModelAssembler);
+
+		// Collection List
+		model.add(
+				linkTo(methodOn(FeedbackController.class).getallFeedbacks(0, 5)).withRel(IanaLinkRelations.COLLECTION));
+
+		for (FeedbackResponseDto feedbackResponseDto : model) {
+
+			// Customer Link
+			CustomerDetailsResponseDto customer = feedbackResponseDto.getCustomer();
+
+			customer.add(linkTo(methodOn(CustomerController.class)
+					.getCustomerHandler(feedbackResponseDto.getCustomer().getContact())).withRel("customer"));
+
+			feedbackResponseDto.setCustomer(customer);
+
+			// Order Link
+			OrderDetailsResponseDto order = feedbackResponseDto.getOrder();
+
+			order.add(linkTo(methodOn(OrderController.class).getOrderById(feedbackResponseDto.getOrder().getOrderId()))
+					.withRel("order"));
+
+			feedbackResponseDto.setOrder(order);
+		}
+
+		return new ResponseEntity<CollectionModel<FeedbackResponseDto>>(model, HttpStatus.OK);
 	}
 
-	@GetMapping("/dates")
-	public ResponseEntity<PageResponse> getFeedbacksByDate(
+	@GetMapping("/sortby/dates")
+	public ResponseEntity<CollectionModel<FeedbackResponseDto>> getFeedbacksByDate(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
-			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection) {
+			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
+			throws ResourceNotFoundException {
 
-		PageResponse pageResponse = this.feedbackServices.getFeedbacksByDate(pageNumber, pageSize, sortDirection);
+		Page<Feedback> pageResponse = this.feedbackServices.getFeedbacksByDate(pageNumber, pageSize, sortDirection);
 
-		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
+		PagedModel<FeedbackResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, feedbackModelAssembler);
+
+		// Collection List
+		model.add(
+				linkTo(methodOn(FeedbackController.class).getallFeedbacks(0, 5)).withRel(IanaLinkRelations.COLLECTION));
+
+		for (FeedbackResponseDto feedbackResponseDto : model) {
+
+			// Customer Link
+			CustomerDetailsResponseDto customer = feedbackResponseDto.getCustomer();
+
+			customer.add(linkTo(methodOn(CustomerController.class)
+					.getCustomerHandler(feedbackResponseDto.getCustomer().getContact())).withRel("customer"));
+
+			feedbackResponseDto.setCustomer(customer);
+
+			// Order Link
+			OrderDetailsResponseDto order = feedbackResponseDto.getOrder();
+
+			order.add(linkTo(methodOn(OrderController.class).getOrderById(feedbackResponseDto.getOrder().getOrderId()))
+					.withRel("order"));
+
+			feedbackResponseDto.setOrder(order);
+		}
+
+		return new ResponseEntity<CollectionModel<FeedbackResponseDto>>(model, HttpStatus.OK);
 
 	}
 
 	// method to serve images
-	@GetMapping(value = "/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+	@GetMapping(value = "/images/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
 	public void serveFeedBackImage(@PathVariable("imageName") String imageName, HttpServletResponse response)
 			throws ResourceNotFoundException, IOException, FileTypeNotValidException {
 
@@ -169,33 +275,27 @@ public class FeedbackController {
 	}
 
 	// method to delete images
-	@DeleteMapping("/images/{fileName}")
-	public ResponseEntity<ApiResponse> deleteFeedBackImage(@PathVariable("fileName") String fileName)
+	@DeleteMapping("/images/{imageName}")
+	public ResponseEntity<ApiResponse> deleteFeedBackImage(@PathVariable("imageName") String imageName)
 			throws IOException {
 
-		ApiResponse apiResponse = this.feedbackServices.deleteFeedBackImage(fileName);
+		ApiResponse apiResponse = this.feedbackServices.deleteFeedBackImage(imageName);
 
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 
 	@GetMapping("/")
-	public ResponseEntity<CollectionModel<FeedbackResponseDto>> getallFeedbacks() throws ResourceNotFoundException {
+	public ResponseEntity<CollectionModel<FeedbackResponseDto>> getallFeedbacks(
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize)
+			throws ResourceNotFoundException {
 
-		List<FeedbackResponseDto> getallFeedbacks = this.feedbackServices.getallFeedbacks();
+		Page<Feedback> getallFeedbacks = this.feedbackServices.getallFeedbacks(pageNumber, pageSize);
 
-		for (FeedbackResponseDto feedbackResponseDto : getallFeedbacks) {
+		PagedModel<FeedbackResponseDto> model = pagedResourcesAssembler.toModel(getallFeedbacks,
+				feedbackModelAssembler);
 
-			feedbackResponseDto
-					.add(linkTo(methodOn(FeedbackController.class).getFeedbackById(feedbackResponseDto.getFeedbackId()))
-							.withSelfRel());
-
-		}
-
-		CollectionModel<FeedbackResponseDto> collectionModel = CollectionModel.of(getallFeedbacks);
-
-		collectionModel.add(linkTo(methodOn(FeedbackController.class).getallFeedbacks()).withSelfRel());
-
-		return new ResponseEntity<CollectionModel<FeedbackResponseDto>>(collectionModel, HttpStatus.OK);
+		return new ResponseEntity<CollectionModel<FeedbackResponseDto>>(model, HttpStatus.OK);
 	}
 
 	@GetMapping("/{feedbackId}")
@@ -204,13 +304,39 @@ public class FeedbackController {
 
 		FeedbackResponseDto feedbackResponseDto = this.feedbackServices.getFeedbackById(feedbackId);
 
+		// Self Link
 		feedbackResponseDto.add(linkTo(methodOn(FeedbackController.class).getFeedbackById(feedbackId)).withSelfRel());
-		
+
+		// Collection Link
 		feedbackResponseDto.add(
-				linkTo(methodOn(FeedbackController.class).getallFeedbacks()).withRel(IanaLinkRelations.COLLECTION));
-		
-		
-		
+				linkTo(methodOn(FeedbackController.class).getallFeedbacks(0, 1)).withRel(IanaLinkRelations.COLLECTION));
+
+		// Customer Link
+		CustomerDetailsResponseDto customer = feedbackResponseDto.getCustomer();
+
+		customer.add(linkTo(
+				methodOn(CustomerController.class).getCustomerHandler(feedbackResponseDto.getCustomer().getContact()))
+				.withRel("customer"));
+
+		feedbackResponseDto.setCustomer(customer);
+
+		// Order Link
+		OrderDetailsResponseDto order = feedbackResponseDto.getOrder();
+
+		order.add(linkTo(methodOn(OrderController.class).getOrderById(feedbackResponseDto.getOrder().getOrderId()))
+				.withRel("order"));
+
+		List<OrderProductDetails> listOfProducts = feedbackResponseDto.getOrder().getListOfProducts();
+
+		for (OrderProductDetails o : listOfProducts) {
+
+			o.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(o.getProductId())).withSelfRel());
+
+		}
+
+		order.setListOfProducts(listOfProducts);
+		feedbackResponseDto.setOrder(order);
+
 		return new ResponseEntity<FeedbackResponseDto>(feedbackResponseDto, HttpStatus.OK);
 	}
 
