@@ -67,7 +67,7 @@ public class ProductController {
 		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.FOUND);
 	}
 
-	@GetMapping("/")
+	@GetMapping("/all/page")
 	public ResponseEntity<PageResponse> getProductsByPageHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize) {
@@ -77,7 +77,7 @@ public class ProductController {
 		return new ResponseEntity<PageResponse>(productsByPage, HttpStatus.OK);
 	}
 
-	@GetMapping("/sort/rating")
+	@GetMapping("/all/sort/rating")
 	public ResponseEntity<PageResponse> getSortedProductsByRatingHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
@@ -89,7 +89,7 @@ public class ProductController {
 		return new ResponseEntity<PageResponse>(productsByRating, HttpStatus.OK);
 	}
 
-	@GetMapping("/filter/category/{categoryId}/sort/rating")
+	@GetMapping("/all/filter/category/{categoryId}/sortby/rating")
 	public ResponseEntity<PageResponse> findByCategorySortByRating(@PathVariable("categoryId") Integer categoryId,
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
@@ -102,21 +102,21 @@ public class ProductController {
 		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
 	}
 
-//	@GetMapping("/filter/category/{categoryId}/sort/addeddate")
-//	public ResponseEntity<PageResponse> findByCategorySortByProductAddedDate(
-//			@PathVariable("categoryId") Integer categoryId,
-//			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
-//			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
-//			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
-//			throws ResourceNotFoundException {
-//
-//		PageResponse pageResponse = this.productServices.findByCategorySortByProductAddedDate(categoryId, pageNumber,
-//				pageSize, sortDirection);
-//
-//		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
-//	}
+	@GetMapping("/all/filter/category/{categoryId}/sortby/addeddate")
+	public ResponseEntity<PageResponse> findByCategorySortByProductAddedDate(
+			@PathVariable("categoryId") Integer categoryId,
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
+			throws ResourceNotFoundException {
 
-	@GetMapping("/sort/price")
+		PageResponse pageResponse = this.productServices.findByCategorySortByProductAddedDate(categoryId, pageNumber,
+				pageSize, sortDirection);
+
+		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
+	}
+
+	@GetMapping("/all/sort/price")
 	public ResponseEntity<PageResponse> getSortedProductsBySalePriceHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
@@ -128,7 +128,7 @@ public class ProductController {
 		return new ResponseEntity<PageResponse>(productsBySalePrice, HttpStatus.OK);
 	}
 
-	@GetMapping("/sort/manufacturingyear")
+	@GetMapping("/all/sort/manufacturingyear")
 	public ResponseEntity<PageResponse> getSortedProductsByManufacturingYearHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
@@ -141,7 +141,7 @@ public class ProductController {
 
 	}
 
-	@GetMapping("/sort/manufacturingmonth")
+	@GetMapping("/all/sort/manufacturingmonth")
 	public ResponseEntity<PageResponse> getSortedProductsByManufacturingMonthHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
@@ -154,7 +154,7 @@ public class ProductController {
 
 	}
 
-	@GetMapping("/sortby")
+	@GetMapping("/all/sortby")
 	public ResponseEntity<PageResponse> getSortedByAnyProductDetailsByPageHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
@@ -168,7 +168,7 @@ public class ProductController {
 
 	}
 
-	@GetMapping("/sort/dateadded")
+	@GetMapping("/all/sort/dateadded")
 	public ResponseEntity<PageResponse> getSortedProductsByAddedDateHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
@@ -181,7 +181,7 @@ public class ProductController {
 
 	}
 
-	@GetMapping("/search")
+	@GetMapping("/all/search")
 	public ResponseEntity<List<ProductResponseDto>> searchProductsByProductNameKeywordHandler(
 			@RequestParam String keyword) {
 
@@ -191,7 +191,7 @@ public class ProductController {
 		return new ResponseEntity<List<ProductResponseDto>>(productsByProductNameKeyword, HttpStatus.FOUND);
 	}
 
-	@GetMapping("/categories/{categoryId}")
+	@GetMapping("/all/categories/{categoryId}")
 	public ResponseEntity<List<ProductResponseDto>> searchByCategoryHandler(
 			@PathVariable("categoryId") Integer categoryId) throws ResourceNotFoundException {
 
@@ -200,7 +200,7 @@ public class ProductController {
 		return new ResponseEntity<List<ProductResponseDto>>(searchByCategory, HttpStatus.FOUND);
 	}
 
-	@PostMapping("/{categoryId}")
+	@PostMapping("/admin/{categoryId}")
 	public ResponseEntity<ProductResponseDto> addProductHandler(@PathVariable("categoryId") Integer categoryId,
 			@Valid @RequestParam String productRequestDto, @RequestParam MultipartFile[] images)
 			throws ResourceNotFoundException, ResourceNotAllowedException, IOException, FileTypeNotValidException {
@@ -213,7 +213,7 @@ public class ProductController {
 		return new ResponseEntity<ProductResponseDto>(product, HttpStatus.ACCEPTED);
 	}
 
-	@PutMapping("/{productId}/categories/{categoryId}")
+	@PutMapping("/admin/{productId}/categories/{categoryId}")
 	public ResponseEntity<ProductResponseDto> updateProductCategoryHandler(@PathVariable("productId") Integer productId,
 			@PathVariable("categoryId") Integer categoryId)
 			throws ResourceNotFoundException, ResourceNotAllowedException {
@@ -223,7 +223,7 @@ public class ProductController {
 		return new ResponseEntity<ProductResponseDto>(updatedProduct, HttpStatus.ACCEPTED);
 	}
 
-	@PutMapping("/{productId}/onsale")
+	@PutMapping("/admin/{productId}/onsale")
 	ResponseEntity<ProductResponseDto> revokeProductOnDiscountSale(@PathVariable("productId") Integer productId)
 			throws ResourceNotFoundException {
 
@@ -232,7 +232,7 @@ public class ProductController {
 		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.OK);
 	}
 
-	@PutMapping("/{productId}")
+	@PutMapping("/admin/{productId}")
 	public ResponseEntity<ProductResponseDto> updateProductDetailsHandler(@PathVariable("productId") Integer productId,
 			@Valid @RequestBody ProductUpdateRequestDto productRequestDto) throws ResourceNotFoundException {
 
@@ -242,7 +242,7 @@ public class ProductController {
 
 	}
 
-	@PutMapping("/images/{productId}")
+	@PutMapping("/admin/images/{productId}")
 	public ResponseEntity<ProductResponseDto> updateProductImage(@RequestParam MultipartFile[] images,
 			@PathVariable("productId") Integer productId)
 			throws ResourceNotFoundException, IOException, FileTypeNotValidException {
@@ -252,7 +252,7 @@ public class ProductController {
 		return new ResponseEntity<ProductResponseDto>(updateProductImage, HttpStatus.OK);
 	}
 
-	@PutMapping("/{productId}/available")
+	@PutMapping("/admin/{productId}/available")
 	public ResponseEntity<ProductResponseDto> revokeAvailability(@PathVariable("productId") Integer productId)
 			throws ResourceNotFoundException {
 
@@ -261,7 +261,7 @@ public class ProductController {
 		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.OK);
 	}
 
-	@PutMapping("/{productId}/buyerschoice")
+	@PutMapping("/admin/{productId}/buyerschoice")
 	public ResponseEntity<ProductResponseDto> revokeBuyersChoice(@PathVariable("productId") Integer productId)
 			throws ResourceNotFoundException {
 
@@ -270,7 +270,7 @@ public class ProductController {
 		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.OK);
 	}
 
-	@DeleteMapping("/{productId}")
+	@DeleteMapping("/admin/{productId}/delete")
 	public ResponseEntity<ApiResponse> deleteProductByIdHandler(@PathVariable("productId") Integer productId)
 			throws ResourceNotFoundException {
 
@@ -299,7 +299,7 @@ public class ProductController {
 	}
 
 	// method to delete images
-	@DeleteMapping("/images/{fileName}")
+	@DeleteMapping("/admin/images/{fileName}")
 	public ResponseEntity<ApiResponse> deleteImage(@PathVariable("fileName") String fileName) throws IOException {
 
 		ApiResponse apiResponse = this.productServices.deleteProductImage(fileName);
