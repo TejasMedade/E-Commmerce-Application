@@ -127,7 +127,7 @@ public class ReviewController {
 	}
 
 	// method to serve images
-	@GetMapping(value = "/image/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
+	@GetMapping(value = "/images/{imageName}", produces = MediaType.IMAGE_JPEG_VALUE)
 	public void serveImageHandler(@PathVariable("imageName") String imageName, HttpServletResponse response)
 			throws IOException, ResourceNotFoundException, FileTypeNotValidException {
 
@@ -135,12 +135,12 @@ public class ReviewController {
 
 	}
 
-	// method to delete images
-	@DeleteMapping("/images/{fileName}")
-	public ResponseEntity<ApiResponse> deleteImage(@PathVariable("fileName") String fileName) throws IOException {
-
-		ApiResponse apiResponse = this.reviewServices.deleteReviewImage(fileName);
-
+	@DeleteMapping("/{reviewId}/delete")
+	public ResponseEntity<ApiResponse> deleteReview(@PathVariable("reviewId") Integer reviewId)
+			throws ResourceNotFoundException, IOException {
+		
+		ApiResponse apiResponse = this.reviewServices.deleteReview(reviewId);
+		
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 
