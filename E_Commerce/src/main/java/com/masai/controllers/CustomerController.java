@@ -10,6 +10,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,16 +24,23 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.masai.exceptions.FileTypeNotValidException;
 import com.masai.exceptions.ResourceNotFoundException;
+import com.masai.model.Customer;
 import com.masai.modelRequestDto.CustomerUpdateRequestDto;
 import com.masai.modelResponseDto.CustomerDetailsResponseDto;
 import com.masai.modelResponseDto.CustomerResponseDto;
 import com.masai.payloads.ApiResponse;
+import com.masai.payloads.AppConstants;
+import com.masai.payloads.CustomerResponseModelAssembler;
 import com.masai.services.CustomerServices;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * @author tejas
@@ -42,13 +54,44 @@ public class CustomerController {
 	@Autowired
 	private CustomerServices customerService;
 
+	@Autowired
+	private CustomerResponseModelAssembler customerResponseModelAssembler;
+
+	@Autowired
+	private PagedResourcesAssembler<Customer> pagedResourcesAssembler;
+
 	@PutMapping("/{contact}/image")
-	public ResponseEntity<CustomerDetailsResponseDto> updateCustomerImage(String contact, MultipartFile image)
+	public ResponseEntity<CustomerDetailsResponseDto> updateCustomerImageHandler(
+			@PathVariable("contact") String contact, @RequestParam MultipartFile image)
 			throws ResourceNotFoundException, IOException, FileTypeNotValidException {
 
 		CustomerDetailsResponseDto updateCustomerImage = this.customerService.updateCustomerImage(contact, image);
 
-		return new ResponseEntity<CustomerDetailsResponseDto>(updateCustomerImage, HttpStatus.ACCEPTED);
+		// Self Link
+		updateCustomerImage.add(
+				linkTo(methodOn(CustomerController.class).updateCustomerImageHandler(contact, image)).withSelfRel());
+
+		// Customer Link
+		updateCustomerImage
+				.add(linkTo(methodOn(CustomerController.class).getCustomerHandler(updateCustomerImage.getContact()))
+						.withRel("customer"));
+
+		// Cart
+		updateCustomerImage.add(linkTo(methodOn(CartController.class).getCartHandler(contact)).withRel("cart"));
+
+		// Orders
+		updateCustomerImage
+				.add(linkTo(methodOn(OrderController.class).getAllOrdersByCustomer(contact)).withRel("orders"));
+
+		// Review
+		updateCustomerImage
+				.add(linkTo(methodOn(ReviewController.class).getReviewsByCustomer(contact)).withRel("reviews"));
+
+		// Feedbacks
+		updateCustomerImage.add(linkTo(methodOn(FeedbackController.class).getAllFeedbacksByCustomer(contact, null, null,
+				AppConstants.SORTDIRECTION)).withRel("feedbacks"));
+
+		return new ResponseEntity<CustomerDetailsResponseDto>(updateCustomerImage, HttpStatus.OK);
 	}
 
 	@PutMapping("/{contact}/update")
@@ -59,7 +102,31 @@ public class CustomerController {
 		CustomerDetailsResponseDto updateCustomerDetails = this.customerService.updateCustomerDetails(contact,
 				customerUpdateRequestDto);
 
-		return new ResponseEntity<CustomerDetailsResponseDto>(updateCustomerDetails, HttpStatus.ACCEPTED);
+		// Self Link
+		updateCustomerDetails.add(
+				linkTo(methodOn(CustomerController.class).updateCustomerDetailsHandler(contact, null)).withSelfRel());
+
+		// Customer Link
+		updateCustomerDetails
+				.add(linkTo(methodOn(CustomerController.class).getCustomerHandler(updateCustomerDetails.getContact()))
+						.withRel("customer"));
+
+		// Cart
+		updateCustomerDetails.add(linkTo(methodOn(CartController.class).getCartHandler(contact)).withRel("cart"));
+
+		// Orders
+		updateCustomerDetails
+				.add(linkTo(methodOn(OrderController.class).getAllOrdersByCustomer(contact)).withRel("orders"));
+
+		// Review
+		updateCustomerDetails
+				.add(linkTo(methodOn(ReviewController.class).getReviewsByCustomer(contact)).withRel("reviews"));
+
+		// Feedbacks
+		updateCustomerDetails.add(linkTo(methodOn(FeedbackController.class).getAllFeedbacksByCustomer(contact, null,
+				null, AppConstants.SORTDIRECTION)).withRel("feedbacks"));
+
+		return new ResponseEntity<CustomerDetailsResponseDto>(updateCustomerDetails, HttpStatus.OK);
 	}
 
 	@DeleteMapping("/{contact}/delete")
@@ -68,15 +135,27 @@ public class CustomerController {
 
 		ApiResponse deleteCustomerAccount = this.customerService.deleteCustomerAccount(contact);
 
-		return new ResponseEntity<ApiResponse>(deleteCustomerAccount, HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(deleteCustomerAccount, HttpStatus.GONE);
 	}
 
 	@GetMapping("/")
-	public ResponseEntity<List<CustomerResponseDto>> getAllCustomerDetailsHandler() {
+	public ResponseEntity<CollectionModel<CustomerResponseDto>> getAllCustomerDetailsHandler(
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection,
+			@RequestParam(defaultValue = AppConstants.CUSTOMERSORTBY, required = false) String sortBy) {
 
-		List<CustomerResponseDto> allCustomerDetails = this.customerService.getAllCustomerDetails();
+		Page<Customer> pageResponse = this.customerService.getAllCustomerDetails(pageNumber, pageSize, sortDirection,
+				sortBy);
 
-		return new ResponseEntity<List<CustomerResponseDto>>(allCustomerDetails, HttpStatus.FOUND);
+		PagedModel<CustomerResponseDto> model = pagedResourcesAssembler.toModel(pageResponse,
+				customerResponseModelAssembler);
+
+		// Collection
+		model.add(linkTo(methodOn(CustomerController.class).getAllCustomerDetailsHandler(pageNumber, pageSize,
+				sortDirection, sortBy)).withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<CustomerResponseDto>>(model, HttpStatus.OK);
 	}
 
 	@GetMapping("/{contact}")
@@ -85,32 +164,92 @@ public class CustomerController {
 
 		CustomerResponseDto customer = this.customerService.getCustomer(contact);
 
-		return new ResponseEntity<CustomerResponseDto>(customer, HttpStatus.FOUND);
+		// Collection
+		customer.add(linkTo(methodOn(CustomerController.class).getAllCustomerDetailsHandler(null, null,
+				AppConstants.SORTDIRECTION, AppConstants.CUSTOMERSORTBY)).withRel(IanaLinkRelations.COLLECTION));
+
+		// Cart
+		customer.add(linkTo(methodOn(CartController.class).getCartHandler(contact)).withRel("cart"));
+
+		// Orders
+		customer.add(linkTo(methodOn(OrderController.class).getAllOrdersByCustomer(contact)).withRel("orders"));
+
+		// Review
+		customer.add(linkTo(methodOn(ReviewController.class).getReviewsByCustomer(contact)).withRel("reviews"));
+
+		// Feedbacks
+		customer.add(linkTo(methodOn(FeedbackController.class).getAllFeedbacksByCustomer(contact, null, null,
+				AppConstants.SORTDIRECTION)).withRel("feedbacks"));
+
+		return new ResponseEntity<CustomerResponseDto>(customer, HttpStatus.OK);
 	}
 
 	@GetMapping("/{firstname}")
-	public ResponseEntity<List<CustomerResponseDto>> searchByfirstName(@PathVariable("firstname") String firstName) {
+	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByfirstNameHandler(
+			@PathVariable("firstname") String firstName) throws ResourceNotFoundException {
 
-		List<CustomerResponseDto> searchByfirstName = this.customerService.searchByfirstName(firstName);
+		List<CustomerResponseDto> pageResponse = this.customerService.searchByfirstName(firstName);
 
-		return new ResponseEntity<List<CustomerResponseDto>>(searchByfirstName, HttpStatus.FOUND);
+		for (CustomerResponseDto customerResponseDto : pageResponse) {
+
+			customerResponseDto
+					.add(linkTo(methodOn(CustomerController.class).getCustomerHandler(customerResponseDto.getContact()))
+							.withRel("customer"));
+
+		}
+
+		CollectionModel<CustomerResponseDto> collectionModel = CollectionModel.of(pageResponse);
+
+		// Collection
+		collectionModel.add(linkTo(methodOn(CustomerController.class).getAllCustomerDetailsHandler(null, null,
+				AppConstants.SORTDIRECTION, AppConstants.CUSTOMERSORTBY)).withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<CustomerResponseDto>>(collectionModel, HttpStatus.OK);
 
 	}
 
 	@GetMapping("/{lastname}")
-	public ResponseEntity<List<CustomerResponseDto>> searchBylastName(@PathVariable("lastname") String lastName) {
+	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchBylastName(
+			@PathVariable("lastname") String lastName) throws ResourceNotFoundException {
 
-		List<CustomerResponseDto> searchBylastName = this.customerService.searchBylastName(lastName);
+		List<CustomerResponseDto> pageResponse = this.customerService.searchBylastName(lastName);
 
-		return new ResponseEntity<List<CustomerResponseDto>>(searchBylastName, HttpStatus.FOUND);
+		for (CustomerResponseDto customerResponseDto : pageResponse) {
+
+			customerResponseDto
+					.add(linkTo(methodOn(CustomerController.class).getCustomerHandler(customerResponseDto.getContact()))
+							.withRel("customer"));
+		}
+
+		CollectionModel<CustomerResponseDto> collectionModel = CollectionModel.of(pageResponse);
+
+		// Collection
+		collectionModel.add(linkTo(methodOn(CustomerController.class).getAllCustomerDetailsHandler(null, null,
+				AppConstants.SORTDIRECTION, AppConstants.CUSTOMERSORTBY)).withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<CustomerResponseDto>>(collectionModel, HttpStatus.OK);
 	}
 
 	@GetMapping("/{email}")
-	public ResponseEntity<List<CustomerResponseDto>> searchByEmailId(@PathVariable("email") String email) {
+	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByEmailId(@PathVariable("email") String email)
+			throws ResourceNotFoundException {
 
-		List<CustomerResponseDto> searchByemailId = this.customerService.searchByemailId(email);
+		List<CustomerResponseDto> pageResponse = this.customerService.searchByemailId(email);
 
-		return new ResponseEntity<List<CustomerResponseDto>>(searchByemailId, HttpStatus.FOUND);
+		for (CustomerResponseDto customerResponseDto : pageResponse) {
+
+			customerResponseDto
+					.add(linkTo(methodOn(CustomerController.class).getCustomerHandler(customerResponseDto.getContact()))
+							.withRel("customer"));
+		}
+
+		CollectionModel<CustomerResponseDto> collectionModel = CollectionModel.of(pageResponse);
+
+		// Collection
+		collectionModel.add(linkTo(methodOn(CustomerController.class).getAllCustomerDetailsHandler(null, null,
+				AppConstants.SORTDIRECTION, AppConstants.CUSTOMERSORTBY)).withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<CustomerResponseDto>>(collectionModel, HttpStatus.OK);
 
 	}
 
@@ -129,6 +268,6 @@ public class CustomerController {
 
 		ApiResponse apiResponse = this.customerService.deleteCustomerImage(imageName);
 
-		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.GONE);
 	}
 }
