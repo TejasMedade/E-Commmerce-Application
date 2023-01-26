@@ -3,7 +3,6 @@
  */
 package com.masai.controllers;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,22 +36,24 @@ public class CartController {
 
 	@PostMapping("/customers/{contact}/products/{productId}")
 	public ResponseEntity<ApiResponse> addProducttoCartHandler(@PathVariable("contact") String contact,
-			@PathVariable("productId") Integer productId,@RequestParam(defaultValue = AppConstants.QUANTITY, required = false) Integer productQuantity)
+			@PathVariable("productId") Integer productId,
+			@RequestParam(defaultValue = AppConstants.QUANTITY, required = false) Integer productQuantity)
 			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		ApiResponse apiResponse = this.cartServices.addProducttoCart(contact, productId, productQuantity);
 
-		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.ACCEPTED);
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 
 	@PutMapping("/customers/{contact}/products/{productId}")
 	public ResponseEntity<ApiResponse> updateCartProductQuantityHandler(@PathVariable("contact") String contact,
-			@PathVariable("productId") Integer productId, @RequestParam(defaultValue = AppConstants.QUANTITY, required = false) Integer productQuantity)
+			@PathVariable("productId") Integer productId,
+			@RequestParam(defaultValue = AppConstants.QUANTITY, required = false) Integer productQuantity)
 			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		ApiResponse apiResponse = this.cartServices.updateCartProductQuantity(contact, productId, productQuantity);
 
-		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.ACCEPTED);
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 
 	@PutMapping("/customers/{contact}")
@@ -61,7 +62,7 @@ public class CartController {
 
 		CartResponseDto cartResponseDto = this.cartServices.emptyCart(contact);
 
-		return new ResponseEntity<CartResponseDto>(cartResponseDto, HttpStatus.OK);
+		return new ResponseEntity<CartResponseDto>(cartResponseDto, HttpStatus.GONE);
 	}
 
 	@DeleteMapping("/customers/{contact}/products/{productId}")
@@ -70,7 +71,7 @@ public class CartController {
 
 		CartResponseDto cartResponseDto = this.cartServices.deleteProductfromCart(contact, productId);
 
-		return new ResponseEntity<CartResponseDto>(cartResponseDto, HttpStatus.OK);
+		return new ResponseEntity<CartResponseDto>(cartResponseDto, HttpStatus.GONE);
 	}
 
 	@GetMapping("customers/{contact}")
@@ -82,8 +83,6 @@ public class CartController {
 		return new ResponseEntity<CartResponseDto>(cartResponseDto, HttpStatus.OK);
 
 	}
-
-
 
 	@PostMapping("customers/{contact}/payments/{paymentId}")
 	public ResponseEntity<OrderResponseDto> buyCart(@PathVariable("contact") String contact,
