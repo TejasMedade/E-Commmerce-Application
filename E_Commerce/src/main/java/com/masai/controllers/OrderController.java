@@ -46,7 +46,7 @@ public class OrderController {
 
 		ApiResponse apiResponse = this.orderServices.orderProduct(contact, paymentId, productId, quantity);
 
-		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.ACCEPTED);
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.CREATED);
 	}
 
 	@GetMapping("/customers/{contact}")
@@ -72,7 +72,7 @@ public class OrderController {
 
 		ApiResponse apiResponse = this.orderServices.deleteOrder(orderId);
 
-		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.GONE);
 	}
 
 	@GetMapping("/{orderId}")
@@ -128,17 +128,17 @@ public class OrderController {
 
 		return new ResponseEntity<List<ReplaceOrderDetailsResponseDto>>(allPendingReplacementRequests, HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/admin/replacements/requests/approved")
-	public ResponseEntity<List<ReplaceOrderDetailsResponseDto>> getAllApprovedReplacementRequests(){
-		
+	public ResponseEntity<List<ReplaceOrderDetailsResponseDto>> getAllApprovedReplacementRequests() {
+
 		List<ReplaceOrderDetailsResponseDto> allApprovedReplacementRequests = this.orderServices
 				.getAllApprovedReplacementRequests();
 
 		return new ResponseEntity<List<ReplaceOrderDetailsResponseDto>>(allApprovedReplacementRequests, HttpStatus.OK);
-		
+
 	}
-	
+
 	@GetMapping("/admin/refunds/requests/approved")
 	public ResponseEntity<List<RefundOrderDetailsResponseDto>> getAllAprovedRefundRequests() {
 
