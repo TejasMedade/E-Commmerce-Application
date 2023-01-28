@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.masai.exceptions.ResourceNotAllowedException;
 import com.masai.exceptions.ResourceNotFoundException;
 import com.masai.model.Category;
 import com.masai.modelRequestDto.CategoryRequestDto;
@@ -65,7 +66,7 @@ public class CategoryController {
 
 	@PostMapping("/")
 	public ResponseEntity<CategoryResponseDto> addCategoryHandler(
-			@Valid @RequestBody CategoryRequestDto categoryRequestDto) throws ResourceNotFoundException {
+			@Valid @RequestBody CategoryRequestDto categoryRequestDto) throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		CategoryResponseDto categoryResponseDto = this.categoryServices.addCategory(categoryRequestDto);
 
@@ -83,7 +84,8 @@ public class CategoryController {
 
 	@PutMapping("/{categoryId}/update")
 	public ResponseEntity<CategoryResponseDto> updateCategoryHandler(@PathVariable("categoryId") Integer categoryId,
-			@Valid @RequestBody CategoryUpdateRequestDto categoryRequestDto) throws ResourceNotFoundException {
+			@Valid @RequestBody CategoryUpdateRequestDto categoryRequestDto)
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		CategoryResponseDto categoryResponseDto = this.categoryServices.updateCategory(categoryId, categoryRequestDto);
 
@@ -91,6 +93,10 @@ public class CategoryController {
 		categoryResponseDto
 				.add(linkTo(methodOn(CategoryController.class).getCategoryHandler(categoryResponseDto.getCategoryId()))
 						.withSelfRel());
+
+		// Product by Category Link
+		categoryResponseDto.add(linkTo(methodOn(ProductController.class).searchByCategoryHandler(categoryId))
+				.withRel("products by category "));
 
 		// Collection Link
 		categoryResponseDto.add(linkTo(methodOn(CategoryController.class).getAllCategoriesByPageHandler(null, null))
@@ -110,7 +116,7 @@ public class CategoryController {
 
 	@GetMapping("/{categoryId}")
 	public ResponseEntity<CategoryResponseDto> getCategoryHandler(@PathVariable("categoryId") Integer categoryId)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		CategoryResponseDto categoryResponseDto = this.categoryServices.getCategory(categoryId);
 
@@ -118,6 +124,10 @@ public class CategoryController {
 		categoryResponseDto
 				.add(linkTo(methodOn(CategoryController.class).getCategoryHandler(categoryResponseDto.getCategoryId()))
 						.withSelfRel());
+
+		// Product by Category Link
+		categoryResponseDto.add(linkTo(methodOn(ProductController.class).searchByCategoryHandler(categoryId))
+				.withRel("products by category "));
 
 		// Collection Link
 		categoryResponseDto.add(linkTo(methodOn(CategoryController.class).getAllCategoriesByPageHandler(null, null))
