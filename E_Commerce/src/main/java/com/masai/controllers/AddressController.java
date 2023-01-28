@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.masai.exceptions.ResourceNotAllowedException;
 import com.masai.exceptions.ResourceNotFoundException;
 import com.masai.modelRequestDto.AddressRequestDto;
 import com.masai.modelRequestDto.AddressUpdateRequestDto;
@@ -50,7 +52,7 @@ public class AddressController {
 
 	@PostMapping("/customers/{contact}")
 	public ResponseEntity<CustomerResponseDto> addAddressDetailsHandler(@PathVariable("contact") String customerContact,
-			@Valid @RequestBody AddressRequestDto addressRequestDto) throws ResourceNotFoundException {
+			@Valid @RequestBody AddressRequestDto addressRequestDto) throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		CustomerResponseDto customerResponseDto = this.addressServices.addAddressDetails(customerContact,
 				addressRequestDto);
@@ -69,7 +71,7 @@ public class AddressController {
 
 	@PutMapping("/customers/{contact}")
 	public ResponseEntity<CustomerResponseDto> udpateAddressDetailsHandler(@PathVariable("contact") String customerContact,
-			@RequestBody AddressUpdateRequestDto addressUpdateRequestDto) throws ResourceNotFoundException {
+			@RequestBody AddressUpdateRequestDto addressUpdateRequestDto) throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		CustomerResponseDto customerResponseDto = this.addressServices.udpateAddressDetails(customerContact,
 				addressUpdateRequestDto);
