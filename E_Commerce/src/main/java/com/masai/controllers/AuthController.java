@@ -91,7 +91,7 @@ public class AuthController {
 
 	}
 
-	@PostMapping("/admin/signin")
+	@PostMapping("/admins/signin")
 	public ResponseEntity<?> loginAdminHandler(@RequestBody JwtAuthRequest loginRequest) {
 
 		Authentication authentication = (authenticationManager).authenticate(
@@ -107,7 +107,7 @@ public class AuthController {
 
 		response.setToken(jwtCookie.getValue());
 
-		response.setResponse(this.modelMapper.map((Customer)userDetails, AdminResponseDto.class));
+		response.setResponse(this.modelMapper.map((Customer) userDetails, AdminResponseDto.class));
 
 		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, jwtCookie.toString()).body(response);
 
@@ -128,9 +128,20 @@ public class AuthController {
 	public ResponseEntity<?> registerUserHandler(@Valid @RequestBody CustomerRequestDto customerRequestDto)
 			throws ResourceNotFoundException {
 
-		if (Boolean.TRUE.equals(this.customerRepo.existsByEmail(customerRequestDto.getEmail()))) {
+		if (Boolean.TRUE.equals(this.customerRepo.existsByContact(customerRequestDto.getContact()))) {
+			
+			
+			
+			if (Boolean.TRUE.equals(this.customerRepo.existsByEmail(customerRequestDto.getEmail()))) {
+
+				return ResponseEntity.badRequest()
+						.body(new DuplicateResourceException("Customer", "Email Id", customerRequestDto.getEmail()));
+
+			}
+
 			return ResponseEntity.badRequest()
-					.body(new DuplicateResourceException("Customer", "Email Id", customerRequestDto.getEmail()));
+					.body(new DuplicateResourceException("Customer", "Contact", customerRequestDto.getContact()));
+
 		}
 
 		CustomerDetailsResponseDto customerDetailsResponseDto = this.customerServices
