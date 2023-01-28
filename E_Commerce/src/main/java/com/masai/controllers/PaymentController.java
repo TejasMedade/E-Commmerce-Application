@@ -34,7 +34,7 @@ import com.masai.services.PaymentServices;
  */
 
 @RestController
-@RequestMapping("bestbuy/payments")
+@RequestMapping("/bestbuy/payments")
 public class PaymentController {
 
 	@Autowired
