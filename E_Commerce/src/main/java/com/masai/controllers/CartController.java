@@ -3,6 +3,8 @@
  */
 package com.masai.controllers;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +16,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import com.masai.exceptions.ResourceNotAllowedException;
 import com.masai.exceptions.ResourceNotFoundException;
+import com.masai.model.CartProductDetails;
 import com.masai.modelResponseDto.CartResponseDto;
 import com.masai.modelResponseDto.OrderResponseDto;
 import com.masai.payloads.ApiResponse;
@@ -76,9 +80,21 @@ public class CartController {
 
 	@GetMapping("customers/{contact}")
 	public ResponseEntity<CartResponseDto> getCartHandler(@PathVariable("contact") String contact)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		CartResponseDto cartResponseDto = this.cartServices.getCart(contact);
+
+		List<CartProductDetails> listOfProducts = cartResponseDto.getListOfProducts();
+
+		for (CartProductDetails c : listOfProducts) {
+
+			// Self Link
+			c.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(c.getProductId())).withSelfRel());
+
+		}
+
+		// Buy Cart Link
+		cartResponseDto.add(linkTo(methodOn(CartController.class).buyCart(contact, null)).withRel("buy cart"));
 
 		return new ResponseEntity<CartResponseDto>(cartResponseDto, HttpStatus.OK);
 
@@ -90,6 +106,20 @@ public class CartController {
 			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		OrderResponseDto orderResponseDto = this.cartServices.buyCart(contact, paymentId);
+
+		// Self Link
+		orderResponseDto
+				.add(linkTo(methodOn(OrderController.class).getOrderById(orderResponseDto.getOrderId())).withSelfRel());
+
+		// Customer Link
+		orderResponseDto.add(linkTo(
+				methodOn(CustomerController.class).getCustomerHandler(orderResponseDto.getCustomer().getContact()))
+				.withRel("customer"));
+
+		// Payment Link
+		orderResponseDto.add(linkTo(
+				methodOn(PaymentController.class).getPaymentMethodHandler(orderResponseDto.getPayment().getPaymentId()))
+				.withRel("payment"));
 
 		return new ResponseEntity<OrderResponseDto>(orderResponseDto, HttpStatus.OK);
 	}
