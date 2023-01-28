@@ -27,7 +27,7 @@ The API's Services  will be used by the **two** categories of users:
 - **Admin (Administrator)**
 
 - **User (Customer)**
--  
+
 ## Tech Stack
 
 - JAVA
