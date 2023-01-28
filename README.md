@@ -9,17 +9,25 @@
 
  **REST API SERVICE**
 
-The **Shopper's Club** has developed this REST API, which allows **Customers** to browse the **Products**, Save them to **Cart** for future, perform all the basic fundamental **CRUD** operations like any other Shopping Application and place **Orders** as per their requirements.
+RESTful API for e-commerce, engineered utilizing the Spring Boot framework and the Java programming language. This API adheres to the principles of RESTful architecture and is designed with scalability and maintainability at the forefront, allowing for effortless integration with third-party applications.
 
-The **Shopper's Club** API also provides **User, Admin Validation & Authentication** for every operation and simplified Exception Handling for layman's easy understanding. 
+A salient feature of this API is its support for image management, which encompasses uploading and serving for customer, product, review, and feedback entities, as well as the ability to delete images from the database using HTTP methods, enabling optimal space management on both the server and client side.
 
-The API's primary objective is to provide **Customers with both a Simple & User-Friendly Shopping Experience.**
+This API boasts a highly modular and adaptable architecture, utilizing a sophisticated model mapping mechanism for seamless integration between entities and Data Transfer Objects (DTOs). This allows for a streamlined development process and a consistent, user-friendly experience through the implementation of custom DTOs for HTTP requests and responses, as well as JSON API responses for all requests.
+
+Security is a top priority for this API, incorporating Spring Security and JSON Web Tokens (JWT) to ensure secure user authentication and role-based access control for each HTTP request, guaranteeing that only authorized users can access sensitive data. Moreover, the API employs Hibernate Validator, a powerful validation framework, to enforce data integrity and constraints across all HTTP requests and request bodies, thereby ensuring the validity and consistency of data throughout the application, and providing custom validation exceptions.
+
+To enhance the user experience, the API incorporates Spring Hypermedia as the Engine of Application State (HATEOAS) library to provide hypermedia links, which aids in user flow and ease of access. Users can also take advantage of the API's pagination, filtering, sorting, and searching functionality, with self, collections, and paging hypermedia links, for improved efficiency. A system-generated admin interface is also provided for ease of use.
+
+With its focus on performance, security, and user-friendliness, this API represents a cutting-edge solution for integrating e-commerce functionality into any application. Whether you are a developer seeking to add e-commerce capabilities to your existing application or a business looking for a powerful and customizable e-commerce platform, this API is the optimal choice.
+
 
 The API's Services  will be used by the **two** categories of users:
 
 - **Admin (Administrator)**
 
-- **User (Customer)** 
+- **User (Customer)**
+-  
 ## Tech Stack
 
 - JAVA
@@ -45,17 +53,6 @@ The API's Services  will be used by the **two** categories of users:
 - LOMBOK
 - MODEL MAPPER
 - LOGGER
-
-
-## Modules
-
-- Admin Module
-- Customer Module
-- Product Module
-- Cart Module 
-- Order Module
-- Address Module
-- Exception Handler Module
 
 
 ## System Structure
