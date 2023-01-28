@@ -3,6 +3,9 @@
  */
 package com.masai.controllers;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -10,6 +13,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +36,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.masai.exceptions.FileTypeNotValidException;
 import com.masai.exceptions.ResourceNotAllowedException;
 import com.masai.exceptions.ResourceNotFoundException;
+import com.masai.model.Product;
 import com.masai.modelRequestDto.ProductRequestDto;
 import com.masai.modelRequestDto.ProductUpdateRequestDto;
 import com.masai.modelResponseDto.ProductResponseDto;
 import com.masai.payloads.ApiResponse;
 import com.masai.payloads.AppConstants;
-import com.masai.payloads.PageResponse;
+import com.masai.payloads.ProductModelAssembler;
 import com.masai.services.ProductServices;
 
 /**
@@ -41,7 +50,7 @@ import com.masai.services.ProductServices;
  *
  */
 @RestController
-@RequestMapping("bestbuy/products")
+@RequestMapping("/bestbuy/products")
 public class ProductController {
 
 	@Autowired
@@ -49,6 +58,12 @@ public class ProductController {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private ProductModelAssembler productModelAssembler;
+
+	@Autowired
+	private PagedResourcesAssembler<Product> pagedResourcesAssembler;
 
 	@GetMapping("/all")
 	public ResponseEntity<List<ProductResponseDto>> getAllProductsHandler() {
@@ -60,144 +75,293 @@ public class ProductController {
 
 	@GetMapping("/{productId}")
 	public ResponseEntity<ProductResponseDto> getProductByIdHandler(@PathVariable("productId") Integer productId)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		ProductResponseDto productResponseDto = this.productServices.getProductById(productId);
 
-		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.FOUND);
+		// Self Link
+		productResponseDto
+				.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(productId)).withSelfRel());
+
+		// Category Link
+		productResponseDto.add(linkTo(
+				methodOn(CategoryController.class).getCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("category"));
+
+		// Product by Category Link
+		productResponseDto.add(linkTo(methodOn(ProductController.class)
+				.searchByCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("products by category "));
+
+		// Collection Links
+		productResponseDto.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		// AddtoCart
+		productResponseDto.add(linkTo(methodOn(CartController.class).addProducttoCartHandler(null, productId, 1))
+				.withRel("add to cart"));
+
+		// BuyProduct
+		productResponseDto.add(
+				linkTo(methodOn(OrderController.class).orderProduct(null, null, productId, 1)).withRel("buy product"));
+
+		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.OK);
 	}
 
 	@GetMapping("/all/page")
-	public ResponseEntity<PageResponse> getProductsByPageHandler(
+	public ResponseEntity<CollectionModel<ProductResponseDto>> getProductsByPageHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
-			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize) {
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize
 
-		PageResponse productsByPage = this.productServices.getProductsByPage(pageNumber, pageSize);
+	) {
 
-		return new ResponseEntity<PageResponse>(productsByPage, HttpStatus.OK);
+		Page<Product> pageResponse = this.productServices.getProductsByPage(pageNumber, pageSize);
+
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 	}
 
 	@GetMapping("/all/sort/rating")
-	public ResponseEntity<PageResponse> getSortedProductsByRatingHandler(
+	public ResponseEntity<CollectionModel<ProductResponseDto>> getSortedProductsByRatingHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection) {
 
-		PageResponse productsByRating = this.productServices.getSortedProductsByRating(pageNumber, pageSize,
+		Page<Product> pageResponse = this.productServices.getSortedProductsByRating(pageNumber, pageSize,
 				sortDirection);
 
-		return new ResponseEntity<PageResponse>(productsByRating, HttpStatus.OK);
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 	}
 
 	@GetMapping("/all/filter/category/{categoryId}/sortby/rating")
-	public ResponseEntity<PageResponse> findByCategorySortByRating(@PathVariable("categoryId") Integer categoryId,
-			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
-			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
-			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
-			throws ResourceNotFoundException {
-
-		PageResponse pageResponse = this.productServices.findByCategorySortByRating(categoryId, pageNumber, pageSize,
-				sortDirection);
-
-		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
-	}
-
-	@GetMapping("/all/filter/category/{categoryId}/sortby/addeddate")
-	public ResponseEntity<PageResponse> findByCategorySortByProductAddedDate(
+	public ResponseEntity<CollectionModel<ProductResponseDto>> findByCategorySortByRating(
 			@PathVariable("categoryId") Integer categoryId,
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
-		PageResponse pageResponse = this.productServices.findByCategorySortByProductAddedDate(categoryId, pageNumber,
+		Page<Product> pageResponse = this.productServices.findByCategorySortByRating(categoryId, pageNumber, pageSize,
+				sortDirection);
+
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Product by Category Link
+		model.add(linkTo(methodOn(ProductController.class).searchByCategoryHandler(categoryId))
+				.withRel("products by category "));
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
+	}
+
+	@GetMapping("/all/filter/category/{categoryId}/sortby/addeddate")
+	public ResponseEntity<CollectionModel<ProductResponseDto>> findByCategorySortByProductAddedDate(
+			@PathVariable("categoryId") Integer categoryId,
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
+			throws ResourceNotFoundException, ResourceNotAllowedException {
+
+		Page<Product> pageResponse = this.productServices.findByCategorySortByProductAddedDate(categoryId, pageNumber,
 				pageSize, sortDirection);
 
-		return new ResponseEntity<PageResponse>(pageResponse, HttpStatus.OK);
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Product by Category Link
+		model.add(linkTo(methodOn(ProductController.class).searchByCategoryHandler(categoryId))
+				.withRel("products by category "));
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 	}
 
 	@GetMapping("/all/sort/price")
-	public ResponseEntity<PageResponse> getSortedProductsBySalePriceHandler(
+	public ResponseEntity<CollectionModel<ProductResponseDto>> getSortedProductsBySalePriceHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
 
-		PageResponse productsBySalePrice = this.productServices.getSortedProductsBySalePrice(pageNumber, pageSize,
+		Page<Product> pageResponse = this.productServices.getSortedProductsBySalePrice(pageNumber, pageSize,
 				sortDirection);
 
-		return new ResponseEntity<PageResponse>(productsBySalePrice, HttpStatus.OK);
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 	}
 
 	@GetMapping("/all/sort/manufacturingyear")
-	public ResponseEntity<PageResponse> getSortedProductsByManufacturingYearHandler(
+	public ResponseEntity<CollectionModel<ProductResponseDto>> getSortedProductsByManufacturingYearHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
 
-		PageResponse productsByManufacturingYear = this.productServices.getSortedProductsByManufacturingYear(pageNumber,
-				pageSize, sortDirection);
+		Page<Product> pageResponse = this.productServices.getSortedProductsByManufacturingYear(pageNumber, pageSize,
+				sortDirection);
 
-		return new ResponseEntity<PageResponse>(productsByManufacturingYear, HttpStatus.OK);
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 
 	}
 
 	@GetMapping("/all/sort/manufacturingmonth")
-	public ResponseEntity<PageResponse> getSortedProductsByManufacturingMonthHandler(
+	public ResponseEntity<CollectionModel<ProductResponseDto>> getSortedProductsByManufacturingMonthHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
 
-		PageResponse productsByManufacturingYear = this.productServices
-				.getSortedProductsByManufacturingMonth(pageNumber, pageSize, sortDirection);
+		Page<Product> pageResponse = this.productServices.getSortedProductsByManufacturingMonth(pageNumber, pageSize,
+				sortDirection);
 
-		return new ResponseEntity<PageResponse>(productsByManufacturingYear, HttpStatus.OK);
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 
 	}
 
 	@GetMapping("/all/sortby")
-	public ResponseEntity<PageResponse> getSortedByAnyProductDetailsByPageHandler(
+	public ResponseEntity<CollectionModel<ProductResponseDto>> getSortedByAnyProductDetailsByPageHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.PRODUCTSORTBY, required = false) String sortBy,
 			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
 
-		PageResponse productsByAnyProductDetailsByPage = this.productServices
-				.getSortedByAnyProductDetailsByPage(pageNumber, pageSize, sortBy, sortDirection);
+		Page<Product> pageResponse = this.productServices.getSortedByAnyProductDetailsByPage(pageNumber, pageSize,
+				sortBy, sortDirection);
 
-		return new ResponseEntity<PageResponse>(productsByAnyProductDetailsByPage, HttpStatus.OK);
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 
 	}
 
 	@GetMapping("/all/sort/dateadded")
-	public ResponseEntity<PageResponse> getSortedProductsByAddedDateHandler(
+	public ResponseEntity<CollectionModel<ProductResponseDto>> getSortedProductsByAddedDateHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
 
-		PageResponse productsByManufacturingYear = this.productServices.getSortedProductsByAddedDate(pageNumber,
-				pageSize, sortDirection);
+		Page<Product> pageResponse = this.productServices.getSortedProductsByAddedDate(pageNumber, pageSize,
+				sortDirection);
 
-		return new ResponseEntity<PageResponse>(productsByManufacturingYear, HttpStatus.OK);
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 
 	}
 
 	@GetMapping("/all/search")
-	public ResponseEntity<List<ProductResponseDto>> searchProductsByProductNameKeywordHandler(
-			@RequestParam String keyword) {
+	public ResponseEntity<CollectionModel<ProductResponseDto>> searchProductsByProductNameKeywordHandler(
+			@RequestParam String keyword) throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		List<ProductResponseDto> productsByProductNameKeyword = this.productServices
 				.searchProductsByProductNameKeyword(keyword);
 
-		return new ResponseEntity<List<ProductResponseDto>>(productsByProductNameKeyword, HttpStatus.FOUND);
+		for (ProductResponseDto productResponseDto : productsByProductNameKeyword) {
+
+			// Self Link
+			productResponseDto.add(
+					linkTo(methodOn(ProductController.class).getProductByIdHandler(productResponseDto.getProductId()))
+							.withSelfRel());
+
+			// AddtoCart
+			productResponseDto.add(linkTo(
+					methodOn(CartController.class).addProducttoCartHandler(null, productResponseDto.getProductId(), 1))
+					.withRel("add to cart"));
+
+			// BuyProduct
+			productResponseDto.add(linkTo(
+					methodOn(OrderController.class).orderProduct(null, null, productResponseDto.getProductId(), 1))
+					.withRel("buy product"));
+
+		}
+
+		CollectionModel<ProductResponseDto> model = CollectionModel.of(productsByProductNameKeyword);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 	}
 
 	@GetMapping("/all/categories/{categoryId}")
-	public ResponseEntity<List<ProductResponseDto>> searchByCategoryHandler(
-			@PathVariable("categoryId") Integer categoryId) throws ResourceNotFoundException {
+	public ResponseEntity<CollectionModel<ProductResponseDto>> searchByCategoryHandler(
+			@PathVariable("categoryId") Integer categoryId)
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		List<ProductResponseDto> searchByCategory = this.productServices.searchByCategory(categoryId);
 
-		return new ResponseEntity<List<ProductResponseDto>>(searchByCategory, HttpStatus.FOUND);
+		for (ProductResponseDto productResponseDto : searchByCategory) {
+
+			// Self Link
+			productResponseDto.add(
+					linkTo(methodOn(ProductController.class).getProductByIdHandler(productResponseDto.getProductId()))
+							.withSelfRel());
+
+			// AddtoCart
+			productResponseDto.add(linkTo(
+					methodOn(CartController.class).addProducttoCartHandler(null, productResponseDto.getProductId(), 1))
+					.withRel("add to cart"));
+
+			// BuyProduct
+			productResponseDto.add(linkTo(
+					methodOn(OrderController.class).orderProduct(null, null, productResponseDto.getProductId(), 1))
+					.withRel("buy product"));
+
+		}
+
+		CollectionModel<ProductResponseDto> model = CollectionModel.of(searchByCategory);
+
+		// Product by Category Link
+		model.add(linkTo(methodOn(ProductController.class).searchByCategoryHandler(categoryId))
+				.withRel("products by category"));
+
+		// Category Link
+		model.add(linkTo(methodOn(CategoryController.class).getCategoryHandler(categoryId)).withRel("category"));
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 	}
 
 	@PostMapping("/admin/{categoryId}")
@@ -208,9 +372,26 @@ public class ProductController {
 		// converting String into JSON
 		ProductRequestDto productrequestDto = objectMapper.readValue(productRequestDto, ProductRequestDto.class);
 
-		ProductResponseDto product = this.productServices.addProduct(categoryId, productrequestDto, images);
+		ProductResponseDto productResponseDto = this.productServices.addProduct(categoryId, productrequestDto, images);
 
-		return new ResponseEntity<ProductResponseDto>(product, HttpStatus.ACCEPTED);
+		// Self Link
+		productResponseDto
+				.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(productResponseDto.getProductId()))
+						.withSelfRel());
+
+		// Product by Category Link
+		productResponseDto
+				.add(linkTo(methodOn(ProductController.class).searchByCategoryHandler(categoryId)).withSelfRel());
+
+		// Category Link
+		productResponseDto
+				.add(linkTo(methodOn(CategoryController.class).getCategoryHandler(categoryId)).withRel("category"));
+
+		// Collection Links
+		productResponseDto.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/admin/{productId}/categories/{categoryId}")
@@ -218,54 +399,166 @@ public class ProductController {
 			@PathVariable("categoryId") Integer categoryId)
 			throws ResourceNotFoundException, ResourceNotAllowedException {
 
-		ProductResponseDto updatedProduct = this.productServices.updateProductCategory(productId, categoryId);
+		ProductResponseDto productResponseDto = this.productServices.updateProductCategory(productId, categoryId);
 
-		return new ResponseEntity<ProductResponseDto>(updatedProduct, HttpStatus.ACCEPTED);
+		// Self Link
+		productResponseDto
+				.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(productResponseDto.getProductId()))
+						.withSelfRel());
+
+		// Category Link
+		productResponseDto
+				.add(linkTo(methodOn(CategoryController.class).getCategoryHandler(categoryId)).withRel("category"));
+
+		// Product by Category Link
+		productResponseDto.add(linkTo(methodOn(ProductController.class).searchByCategoryHandler(categoryId))
+				.withRel("product by category"));
+
+		// Collection Links
+		productResponseDto.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.OK);
 	}
 
 	@PutMapping("/admin/{productId}/onsale")
 	ResponseEntity<ProductResponseDto> revokeProductOnDiscountSale(@PathVariable("productId") Integer productId)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		ProductResponseDto productResponseDto = this.productServices.revokeProductOnDiscountSale(productId);
+
+		// Self Link
+		productResponseDto
+				.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(productResponseDto.getProductId()))
+						.withSelfRel());
+
+		// Category Link
+		productResponseDto.add(linkTo(
+				methodOn(CategoryController.class).getCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("category"));
+
+		// Product by Category Link
+		productResponseDto.add(linkTo(methodOn(ProductController.class)
+				.searchByCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("product by category"));
+
+		// Collection Links
+		productResponseDto.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
 
 		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.OK);
 	}
 
 	@PutMapping("/admin/{productId}")
 	public ResponseEntity<ProductResponseDto> updateProductDetailsHandler(@PathVariable("productId") Integer productId,
-			@Valid @RequestBody ProductUpdateRequestDto productRequestDto) throws ResourceNotFoundException {
+			@Valid @RequestBody ProductUpdateRequestDto productRequestDto)
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
-		ProductResponseDto updatedProduct = this.productServices.updateProductDetails(productId, productRequestDto);
+		ProductResponseDto productResponseDto = this.productServices.updateProductDetails(productId, productRequestDto);
 
-		return new ResponseEntity<ProductResponseDto>(updatedProduct, HttpStatus.ACCEPTED);
+		// Self Link
+		productResponseDto
+				.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(productResponseDto.getProductId()))
+						.withSelfRel());
+
+		// Category Link
+		productResponseDto.add(linkTo(
+				methodOn(CategoryController.class).getCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("category"));
+
+		// Product by Category Link
+		productResponseDto.add(linkTo(methodOn(ProductController.class)
+				.searchByCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("product by category"));
+
+		// Collection Links
+		productResponseDto.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.OK);
 
 	}
 
 	@PutMapping("/admin/images/{productId}")
 	public ResponseEntity<ProductResponseDto> updateProductImage(@RequestParam MultipartFile[] images,
 			@PathVariable("productId") Integer productId)
-			throws ResourceNotFoundException, IOException, FileTypeNotValidException {
+			throws ResourceNotFoundException, IOException, FileTypeNotValidException, ResourceNotAllowedException {
 
-		ProductResponseDto updateProductImage = this.productServices.updateProductImage(images, productId);
+		ProductResponseDto productResponseDto = this.productServices.updateProductImage(images, productId);
 
-		return new ResponseEntity<ProductResponseDto>(updateProductImage, HttpStatus.OK);
+		// Self Link
+		productResponseDto
+				.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(productResponseDto.getProductId()))
+						.withSelfRel());
+		// Category Link
+		productResponseDto.add(linkTo(
+				methodOn(CategoryController.class).getCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("category"));
+
+		// Product by Category Link
+		productResponseDto.add(linkTo(methodOn(ProductController.class)
+				.searchByCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("product by category"));
+
+		// Collection Links
+		productResponseDto.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.OK);
 	}
 
 	@PutMapping("/admin/{productId}/available")
 	public ResponseEntity<ProductResponseDto> revokeAvailability(@PathVariable("productId") Integer productId)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		ProductResponseDto productResponseDto = this.productServices.revokeAvailability(productId);
+
+		// Self Link
+		productResponseDto
+				.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(productResponseDto.getProductId()))
+						.withSelfRel());
+
+		// Category Link
+		productResponseDto.add(linkTo(
+				methodOn(CategoryController.class).getCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("category"));
+
+		// Product by Category Link
+		productResponseDto.add(linkTo(methodOn(ProductController.class)
+				.searchByCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("product by category"));
+
+		// Collection Links
+		productResponseDto.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
 
 		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.OK);
 	}
 
 	@PutMapping("/admin/{productId}/buyerschoice")
 	public ResponseEntity<ProductResponseDto> revokeBuyersChoice(@PathVariable("productId") Integer productId)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		ProductResponseDto productResponseDto = this.productServices.revokeBuyersChoice(productId);
+
+		// Self Link
+		productResponseDto
+				.add(linkTo(methodOn(ProductController.class).getProductByIdHandler(productResponseDto.getProductId()))
+						.withSelfRel());
+
+		// Category Link
+		productResponseDto.add(linkTo(
+				methodOn(CategoryController.class).getCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("category"));
+
+		// Product by Category Link
+		productResponseDto.add(linkTo(methodOn(ProductController.class)
+				.searchByCategoryHandler(productResponseDto.getCategory().getCategoryId()))
+				.withRel("product by category"));
+
+		// Collection Links
+		productResponseDto.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
 
 		return new ResponseEntity<ProductResponseDto>(productResponseDto, HttpStatus.OK);
 	}
@@ -276,7 +569,7 @@ public class ProductController {
 
 		ApiResponse apiResponse = this.productServices.deleteProductById(productId);
 
-		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.GONE);
 	}
 
 	// method to serve images
@@ -304,7 +597,7 @@ public class ProductController {
 
 		ApiResponse apiResponse = this.productServices.deleteProductImage(fileName);
 
-		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
+		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.GONE);
 	}
 
 }
