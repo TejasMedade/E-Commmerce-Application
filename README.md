@@ -35,6 +35,7 @@ The API's Services  will be used by the **two** categories of users:
 
 - JWT AUTHENTICATION
 - SPRING SECURITY
+- SPRING HATEOAS
 - SPRING DATA JPA
 - SPRING BOOT DEVTOOLS
 - SPRING WEB
