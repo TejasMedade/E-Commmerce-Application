@@ -44,7 +44,7 @@ import com.masai.services.ReviewServices;
  *
  */
 @RestController
-@RequestMapping("bestbuy/reviews")
+@RequestMapping("/bestbuy/reviews")
 public class ReviewController {
 
 	@Autowired
@@ -130,7 +130,7 @@ public class ReviewController {
 			@PathVariable("productId") Integer productId,
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		Page<Review> pageResponse = this.reviewServices.getAllReviewsByProductOrderedByDate(productId, pageNumber,
 				pageSize);
@@ -160,7 +160,7 @@ public class ReviewController {
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		Page<Review> pageResponse = this.reviewServices.getAllReviewsByProductOrderedByRating(productId, pageNumber,
 				pageSize, sortDirection);
@@ -190,7 +190,7 @@ public class ReviewController {
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		Page<Review> pageResponse = this.reviewServices.getAllReviewsSortedByRating(pageNumber, pageSize,
 				sortDirection);
@@ -234,7 +234,7 @@ public class ReviewController {
 
 	@GetMapping("/{reviewId}")
 	public ResponseEntity<ReviewResponseDto> getReviewById(@PathVariable("reviewId") Integer reviewId)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		ReviewResponseDto reviewResponseDto = this.reviewServices.getReviewById(reviewId);
 
