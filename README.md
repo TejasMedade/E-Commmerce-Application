@@ -33,6 +33,8 @@ The API's Services  will be used by the **two** categories of users:
 
 ## Dependencies
 
+- JWT AUTHENTICATION
+- SPRING SECURITY
 - SPRING DATA JPA
 - SPRING BOOT DEVTOOLS
 - SPRING WEB
@@ -40,7 +42,9 @@ The API's Services  will be used by the **two** categories of users:
 - MYSQL DRIVER
 - VALIDATION
 - LOMBOK
-- SWAGGER UI
+- MODEL MAPPER
+- LOGGER
+
 
 ## Modules
 
