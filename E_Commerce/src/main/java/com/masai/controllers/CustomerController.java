@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.masai.exceptions.FileTypeNotValidException;
+import com.masai.exceptions.ResourceNotAllowedException;
 import com.masai.exceptions.ResourceNotFoundException;
 import com.masai.model.Customer;
 import com.masai.modelRequestDto.CustomerUpdateRequestDto;
@@ -63,7 +64,7 @@ public class CustomerController {
 	@PutMapping("/{contact}/image")
 	public ResponseEntity<CustomerDetailsResponseDto> updateCustomerImageHandler(
 			@PathVariable("contact") String contact, @RequestParam MultipartFile image)
-			throws ResourceNotFoundException, IOException, FileTypeNotValidException {
+			throws ResourceNotFoundException, IOException, FileTypeNotValidException, ResourceNotAllowedException {
 
 		CustomerDetailsResponseDto updateCustomerImage = this.customerService.updateCustomerImage(contact, image);
 
@@ -80,8 +81,8 @@ public class CustomerController {
 		updateCustomerImage.add(linkTo(methodOn(CartController.class).getCartHandler(contact)).withRel("cart"));
 
 		// Orders
-		updateCustomerImage
-				.add(linkTo(methodOn(OrderController.class).getAllOrdersByCustomer(contact)).withRel("orders"));
+		updateCustomerImage.add(linkTo(methodOn(OrderController.class).getAllOrdersByCustomer(contact, null, null,
+				AppConstants.SORTDIRECTION, AppConstants.CUSTOMERSORTBY)).withRel("orders"));
 
 		// Review
 		updateCustomerImage
@@ -89,7 +90,7 @@ public class CustomerController {
 
 		// Feedbacks
 		updateCustomerImage.add(linkTo(methodOn(FeedbackController.class).getAllFeedbacksByCustomer(contact, null, null,
-				AppConstants.SORTDIRECTION)).withRel("feedbacks"));
+				AppConstants.SORTDIRECTION, AppConstants.FEEDBACKSORTBY)).withRel("feedbacks"));
 
 		return new ResponseEntity<CustomerDetailsResponseDto>(updateCustomerImage, HttpStatus.OK);
 	}
@@ -97,7 +98,8 @@ public class CustomerController {
 	@PutMapping("/{contact}/update")
 	public ResponseEntity<CustomerDetailsResponseDto> updateCustomerDetailsHandler(
 			@PathVariable("contact") String contact,
-			@Valid @RequestBody CustomerUpdateRequestDto customerUpdateRequestDto) throws ResourceNotFoundException {
+			@Valid @RequestBody CustomerUpdateRequestDto customerUpdateRequestDto)
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		CustomerDetailsResponseDto updateCustomerDetails = this.customerService.updateCustomerDetails(contact,
 				customerUpdateRequestDto);
@@ -115,8 +117,8 @@ public class CustomerController {
 		updateCustomerDetails.add(linkTo(methodOn(CartController.class).getCartHandler(contact)).withRel("cart"));
 
 		// Orders
-		updateCustomerDetails
-				.add(linkTo(methodOn(OrderController.class).getAllOrdersByCustomer(contact)).withRel("orders"));
+		updateCustomerDetails.add(linkTo(methodOn(OrderController.class).getAllOrdersByCustomer(contact, null, null,
+				AppConstants.SORTDIRECTION, AppConstants.ORDERSORTBY)).withRel("orders"));
 
 		// Review
 		updateCustomerDetails
@@ -124,7 +126,7 @@ public class CustomerController {
 
 		// Feedbacks
 		updateCustomerDetails.add(linkTo(methodOn(FeedbackController.class).getAllFeedbacksByCustomer(contact, null,
-				null, AppConstants.SORTDIRECTION)).withRel("feedbacks"));
+				null, AppConstants.SORTDIRECTION, AppConstants.FEEDBACKSORTBY)).withRel("feedbacks"));
 
 		return new ResponseEntity<CustomerDetailsResponseDto>(updateCustomerDetails, HttpStatus.OK);
 	}
@@ -160,7 +162,7 @@ public class CustomerController {
 
 	@GetMapping("/{contact}")
 	public ResponseEntity<CustomerResponseDto> getCustomerHandler(@PathVariable("contact") String contact)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		CustomerResponseDto customer = this.customerService.getCustomer(contact);
 
@@ -172,21 +174,22 @@ public class CustomerController {
 		customer.add(linkTo(methodOn(CartController.class).getCartHandler(contact)).withRel("cart"));
 
 		// Orders
-		customer.add(linkTo(methodOn(OrderController.class).getAllOrdersByCustomer(contact)).withRel("orders"));
+		customer.add(linkTo(methodOn(OrderController.class).getAllOrdersByCustomer(contact, null, null,
+				AppConstants.SORTDIRECTION, AppConstants.ORDERSORTBY)).withRel("orders"));
 
 		// Review
 		customer.add(linkTo(methodOn(ReviewController.class).getReviewsByCustomer(contact)).withRel("reviews"));
 
 		// Feedbacks
 		customer.add(linkTo(methodOn(FeedbackController.class).getAllFeedbacksByCustomer(contact, null, null,
-				AppConstants.SORTDIRECTION)).withRel("feedbacks"));
+				AppConstants.SORTDIRECTION, AppConstants.FEEDBACKSORTBY)).withRel("feedbacks"));
 
 		return new ResponseEntity<CustomerResponseDto>(customer, HttpStatus.OK);
 	}
 
 	@GetMapping("/{firstname}")
 	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByfirstNameHandler(
-			@PathVariable("firstname") String firstName) throws ResourceNotFoundException {
+			@PathVariable("firstname") String firstName) throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		List<CustomerResponseDto> pageResponse = this.customerService.searchByfirstName(firstName);
 
@@ -210,7 +213,7 @@ public class CustomerController {
 
 	@GetMapping("/{lastname}")
 	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchBylastName(
-			@PathVariable("lastname") String lastName) throws ResourceNotFoundException {
+			@PathVariable("lastname") String lastName) throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		List<CustomerResponseDto> pageResponse = this.customerService.searchBylastName(lastName);
 
@@ -232,7 +235,7 @@ public class CustomerController {
 
 	@GetMapping("/{email}")
 	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByEmailId(@PathVariable("email") String email)
-			throws ResourceNotFoundException {
+			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		List<CustomerResponseDto> pageResponse = this.customerService.searchByemailId(email);
 
