@@ -51,10 +51,75 @@ The API's Services  will be used by the **two** categories of users:
 - MODEL MAPPER
 - LOGGER
 
-
-## System Structure
-
 ## Administrator Side Features
+
+ - **Administrator Management** 
+
+   - Endpoint for Admin Sign Up
+   - Endpoint for Updating Admin Information
+   - Endpoint for Deleting Admin Accounts
+   - Endpoint for Retrieving Admin Information
+
+ - **Product Management**
+
+   - Endpoint for Adding Products
+   - Endpoint for Updating Product Information
+   - Endpoint for Deleting Product Information
+   - Endpoint for Updating Product Rating
+   - Endpoint for Updating Product Stock Quantity
+   - Endpoint for Updating Product Image
+   - Endpoint for Changing Product's Category
+   - Endpoint for Adding Products to Discount Sales
+   - Endpoint for Revoking Product Availability
+   - Endpoint for Adding Products to Customer's Best Choice
+
+ - **Order Management**
+
+   - Endpoint for Updating Order Status
+   - Endpoint for Searching Orders by User Details
+   - Endpoint for Searching Orders by Order Information
+   - Endpoint for Retrieving Order Information
+   - Endpoint for Approving Refund Requests
+   - Endpoint for Approving Replacement Requests
+   - Endpoint for Retrieving Cancelled/Refunded Orders
+   
+ - **Payment Management**
+
+   - Endpoint for Adding Payment Methods
+   - Endpoint for Updating Payment Methods
+   - Endpoint for Deleting Payment Methods
+   - Endpoint for Revoking Payment Methods
+
+ - **Customer Management**
+
+   - Endpoint for Retrieving Customer Information
+   - Endpoint for Searching Customers by:
+     - First Name
+     - Last Name
+     - First & Last Name
+     - Email ID
+
+ - **Feedback & Reviews**
+
+   - Endpoint for Retrieving Feedback & Reviews
+   - Endpoint for Sorting Feedback & Reviews by:
+     - Rating
+     - Date
+     - Customer
+     - Order
+
+ - **Dashboards**
+
+   - Endpoint for Retrieving Sales Information:
+     - Today's Sales
+     - Last Week's Sales
+     - Last Month's Sales
+     - Sales from Jan to Dec
+   - Endpoint for Retrieving Product Information:
+     - Highest Sold Product by Rating in a Given Duration
+     - Highest Rated Product in a Given Duration
+     - Highest Sold Product Categorized by Sale Price
+     - Highest Sold Product in Different Categories
 
 
 
@@ -92,7 +157,10 @@ The API's Services  will be used by the **two** categories of users:
 - **Feedback & Reviews** 
 
    - Endpoint for Adding Feedback (with Image Attachment Option)
-   - Endpoint for Adding Product Reviews and Ratings
+   - Endpoint for Adding and Deleting Product Reviews and Ratings
+   - Endpoint for Sorting Reviews by:
+     - Added Date
+     - Rating   
    
 - **Payment** 
 
