@@ -4,10 +4,7 @@
 ![Logo](https://nimbus-screenshots.s3.amazonaws.com/s/91e455fba18e9a844446391993ef3a15.png)
 
 
-# E Commerce Application
-
-
- **RESTful API WEB SERVICE**
+## **WEB SERVICE : RESTFUL A.P.I**
 
 RESTful API for e-commerce, engineered utilizing the Spring Boot framework and the Java programming language. This API adheres to the principles of RESTful architecture and is designed with scalability and maintainability at the forefront, allowing for effortless integration with third-party applications.
 
