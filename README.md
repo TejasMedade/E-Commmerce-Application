@@ -292,35 +292,60 @@ http://localhost:8088/swagger-ui/
 ```bash
 http://localhost:8088
 ```
-## Admin Login Logout API Reference
+## Login Logout API Reference
 
-
-## Customer Login Logout API Reference
+![image](https://user-images.githubusercontent.com/105907169/215348560-f18b426c-f90f-4152-928e-a51e245bb7d9.png)
 
 
 ## Admin API Reference
 
+![image](https://user-images.githubusercontent.com/105907169/215348530-2fed42cd-f777-4c40-ba2b-c9e5e8d043ff.png)
 
 
 ## Customer API Reference
 
-
-## Product API Reference
+![image](https://user-images.githubusercontent.com/105907169/215348630-2f14dd7a-7f24-475e-8c6d-d48809378b30.png)
 
 
 ## Address API Reference
 
+![image](https://user-images.githubusercontent.com/105907169/215348507-699558b2-1a1b-4025-916e-7d76bbb5041e.png)
+
+
+
+
+## Category API Reference
+
+![image](https://user-images.githubusercontent.com/105907169/215348610-d384368e-7fc9-4539-87f1-86acff39a8c2.png)
+
+
+## Product API Reference
+
+![image](https://user-images.githubusercontent.com/105907169/215348682-3c36e8df-ab1f-412e-81b0-76514b4fe43d.png)
+
+
+
+
 
 ## Cart API Reference
 
+![image](https://user-images.githubusercontent.com/105907169/215348572-a4311467-1a34-4a17-8a6c-b1141504e8f0.png)
+
 
 ## Order API Reference
+![image](https://user-images.githubusercontent.com/105907169/215348736-a20348b0-2295-4ff3-bd80-947ddb1323ff.png)
 
 
 ## Feedback API Reference
+![image](https://user-images.githubusercontent.com/105907169/215348713-d8c07c9c-1a50-4d98-a824-beb235bad975.png)
 
 
 ## Review API Reference
+![image](https://user-images.githubusercontent.com/105907169/215348691-9ddb1e82-4111-4bbc-a9ba-55d80ee0a445.png)
+
+
+## Payment API Reference
+![image](https://user-images.githubusercontent.com/105907169/215348759-b2ce4903-ff57-454d-85d6-8d3db0173746.png)
 
 
 ## Contributions
