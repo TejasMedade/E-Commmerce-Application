@@ -75,7 +75,7 @@ The API's Services  will be used by the **two** categories of users:
 
  - **Order Management**
 
-   - Endpoint for Updating Order Status
+   - Endpoint for Updating Order Status( Processed, Failed , To be Dispatched, Out For Delivery, Returned, Replaced )
    - Endpoint for Searching Orders by User Details
    - Endpoint for Searching Orders by Order Information
    - Endpoint for Retrieving Order Information
