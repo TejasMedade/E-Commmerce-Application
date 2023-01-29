@@ -53,12 +53,7 @@ The API's Services  will be used by the **two** categories of users:
 
 
 ## System Structure
-
-The REST API allows a Customer to **Signup, Login** & **Browse** through the products and add them to **Cart** wishlist, as well as the Administrator to **View** all the **Orders, Customers & Products** with filtering options. 
-
-Administrator can **Add, Update, View, Delete** **Products** & other **Administrators** from the **Database**.
   
-
 - Administrator
     -
     - Login & Logout
