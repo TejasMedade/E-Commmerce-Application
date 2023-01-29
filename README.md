@@ -7,7 +7,7 @@
 # E Commerce Application
 
 
- **REST API SERVICE**
+ **RESTful API WEB SERVICE**
 
 RESTful API for e-commerce, engineered utilizing the Spring Boot framework and the Java programming language. This API adheres to the principles of RESTful architecture and is designed with scalability and maintainability at the forefront, allowing for effortless integration with third-party applications.
 
