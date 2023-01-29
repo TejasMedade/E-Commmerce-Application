@@ -25,7 +25,7 @@ The API's Services  will be used by the **two** categories of users:
 - **User (Customer)**
 
 
-## A.P.I Features
+## Features
 
 - **RESTful API Design** : Adheres to REST architectural principles, providing a set of CRUD endpoints accessible via standard HTTP methods (GET, POST, PUT, DELETE).
 - **Modular Architecture** : Designed with well-defined modules, facilitating clear separation of concerns for easier maintenance and scalability.
