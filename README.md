@@ -1,8 +1,6 @@
 # E Commerce Application
  
 
-![Logo](https://nimbus-screenshots.s3.amazonaws.com/s/91e455fba18e9a844446391993ef3a15.png)
-
 
 ## **WEB SERVICE : RESTFUL A.P.I**
 
@@ -210,7 +208,7 @@ https://dev.mysql.com/downloads/mysql/
 Clone the Repository
 
 ```bash
-git clone the repo : [E-Commerce-Application](https://github.com/TejasMedade/E-Commmerce-Application)
+https://github.com/TejasMedade/E-Commmerce-Application
 ```
 
 Open MySQL Server
@@ -283,10 +281,6 @@ http://localhost:8088/swagger-ui/
 ## ER Diagram
 
 
-![Online Shopping Application(1)](https://user-images.githubusercontent.com/105907169/202779904-80050caf-b679-4b67-9afe-da67296fcb59.png)
-
-
-
 
 ## Demo
 
@@ -299,41 +293,47 @@ http://localhost:8088/swagger-ui/
 http://localhost:8088
 ```
 ## Admin Login Logout API Reference
-![image](https://user-images.githubusercontent.com/105907169/202855307-82cc63ca-7183-4785-8b30-31794d6dc7cb.png)
+
 
 ## Customer Login Logout API Reference
-![image](https://user-images.githubusercontent.com/105907169/202855339-e5f872f6-e120-42cb-9fe8-432fb7ed9018.png)
+
 
 ## Admin API Reference
 
-![Screenshot 2022-11-25 at 12-54-24 Swagger UI](https://user-images.githubusercontent.com/105907169/203924387-d053fa23-1a77-4c03-b33d-45d3007360d1.png)
+
 
 ## Customer API Reference
-![image](https://user-images.githubusercontent.com/105907169/202855233-53a77b6f-dd18-4a74-b615-5aeb16f15da3.png)
+
 
 ## Product API Reference
-![image](https://user-images.githubusercontent.com/105907169/202855428-2f93dc36-0e11-41b4-b592-5138eebd3e0b.png)
+
 
 ## Address API Reference
-![image](https://user-images.githubusercontent.com/105907169/202855062-1588b3a0-caa6-46b5-accd-6759e86f2e98.png)
+
 
 ## Cart API Reference
-![image](https://user-images.githubusercontent.com/105907169/202855032-4b7c5510-b6c3-44e0-b496-e8d52d571165.png)
+
 
 ## Order API Reference
-![image](https://user-images.githubusercontent.com/105907169/202855388-da648cc9-bf27-42a8-bb2f-9e19f67f63b4.png)
 
+
+## Feedback API Reference
+
+
+## Review API Reference
 
 
 ## Contributions
 
-Contributions are always **Welcome** !
-
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **Greatly Appreciated**.
 
-If you have a suggestion that would make this REST API better, Please fork the repo and create a pull request. You can also connect with me for further development of this application !
+If you have any ideas on how to improve this resume, please feel free to fork the repository and submit a pull request. Your contributions, no matter how big or small, are greatly appreciated and will help to make this repository even better.
 
-Don't forget to give the project a star ! Thank You !
+In addition to contributing to the repository, you can also connect with me for further development and collaboration on this API. Together, we can continue to improve and evolve the API to meet the needs of the community.
+
+We encourage you to give the repository a star and we thank you for your interest in this project. 
+
+Your support is greatly appreciated.
 
 ## 🔗 Contact Me
 [![portfolio](https://img.shields.io/badge/my_portfolio-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://tejasmedade.github.io/)
@@ -347,7 +347,6 @@ Don't forget to give the project a star ! Thank You !
 - [Tejas Vilas Medade](https://github.com/tejasmedade)
 
 ## Acknowledgements
-
 
 - [Masai School](https://www.masaischool.com/)
  
