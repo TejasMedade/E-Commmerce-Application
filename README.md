@@ -227,7 +227,7 @@ System Generated Admin For Your Database
 
 ## Important Note
 
-
+- At present, Swagger does not support cookie-based authorization. The team will look into implementing it once Swagger provides the necessary features to support it.
 - When utilizing the PostMan software, ensure that the request includes embedded cookies as JWT authentication is implemented as a cookie-based authentication mechanism.
 
 - The roles have already been established within the database. Ensure that the appropriate requests are executed for both the Admin and User roles.
@@ -268,7 +268,7 @@ To change the **Server Port**
 server.port=8088
 ```
 
-Go to **com.masai package > Online_Shopping_System.java**
+Go to **com.masai package > ECommerceApplication.java**
 
 ```bash
 Run as Spring Boot App !
