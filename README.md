@@ -53,34 +53,76 @@ The API's Services  will be used by the **two** categories of users:
 
 
 ## System Structure
+
+## Administrator Side Features
+
+
+
+## User Side Features
+
+ - **Customer Management** 
+
+   - Endpoint for Sign Up
+   - Endpoint for Updating Customer Information
+   - Endpoint for Deleting Customer Accounts
+   - Endpoint for Retrieving Customer Information
+   - Endpoint for Updating Customer Profile Pictures
+   - Endpoint for Deleting Customer Profile Pictures
+ 
+ - **Address Management**
   
-- Administrator
-    -
-    - Login & Logout
-    - View all Products
-    - View all Orders of an User
-    - View all Customers
-    - Add New Products into Database
-    - Remove Products from Database
-    - Update Products in Database 
-    - Delete Admin from Database
-
-- User / Customer
-    -
-    - Signup 
-    - Login & Logout
-    - Update all Personal Details and Address 
-    - View all Products with filtering options
-    - Add Products to Cart
-    - Update Products Quantity in Cart 
-    - Delete Products from Cart
-    - Empty Cart
-    - Add Order
-    - Cancel Order
-    - View Orders with filtering options
-    - Delete Customer Account
+   - Endpoint for Adding Addresses
+   - Endpoint for Retrieving Customer Addresses
+   - Endpoint for Updating Customer Addresses
     
+ - **Cart Management** 
+   - Endpoint for Adding Products to Cart
+   - Endpoint for Updating Product Quantity in Cart
+   - Endpoint for Emptying the Cart
+   - Endpoint for Deleting Products from Cart
+   - Endpoint for Retrieving Cart Details
+   - Endpoint for Processing a Cart Purchase
+   
+- **Category Management** 
+   - Endpoint for Retrieving Categories
+   - Endpoint for Retrieving Products by Category
+   - Endpoint for Sorting Products by Category Information
+   - Endpoint for Searching Categories
+   
+- **Feedback & Reviews** 
 
+   - Endpoint for Adding Feedback (with Image Attachment Option)
+   - Endpoint for Adding Product Reviews and Ratings
+   
+- **Payment** 
+
+   - Endpoint for Retrieving Available Payment Methods
+
+- **Product Management** 
+
+   - Endpoint for Retrieving Product Details
+   - Endpoints for Sorting Products by:
+     - Rating
+     - Sale Price
+     - Sale Availability
+     - Popularity among Customers
+     - Manufacturing Month/Year
+     - Addition Date
+     - Addition Date by Category
+     - Rating within a Category
+    - Endpoints for Searching Products by:
+      - Name
+      - Type
+     
+       
+- **Order Management**
+
+   - Endpoint for Placing Orders
+   - Endpoint for Retrieving Order History
+   - Endpoint for Cancelling Orders
+   - Endpoint for Requesting Refunds/Replacements
+   - Endpoint for Tracking Order/Refund/Replacement Status
+    
 
 
 
