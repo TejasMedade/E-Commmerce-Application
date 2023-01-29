@@ -251,7 +251,7 @@ System Generated Admin For Your Database
 Go to the Project Directory
 
 ```bas
-Open the Online_Shopping_System Folder with S.T.S
+Open the E-Commerce Folder with S.T.S
 ```
 
 Go to **src/main/resources > application.properties** & change your username and password (MySQL server username & password)
