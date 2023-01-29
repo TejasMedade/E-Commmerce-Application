@@ -23,6 +23,49 @@ The API's Services  will be used by the **two** categories of users:
 
 - **User (Customer)**
 
+
+## A.P.I Features
+
+- **RESTful API Design** : Adheres to REST architectural principles, providing a set of CRUD endpoints accessible via standard HTTP methods (GET, POST, PUT, DELETE).
+- **Modular Architecture** : Designed with well-defined modules, facilitating clear separation of concerns for easier maintenance and scalability.
+
+- **Human-Readable URIs** : Uses user-friendly URIs for improved usability.
+
+- **Image Handling** : Supports image upload and retrieval for customers, products, reviews, and feedback.
+
+- **Data Mapping** : Employs object mapping to enable data exchange between client and server through mapping entities to transfer objects.
+
+- **Hypermedia Navigation** : Integrates Spring HateOAS for facilitating user navigation through the provision of hypermedia links.
+
+- **Data Retrieval** : Includes functionality for pagination, filtering, sorting, and searching for products, reviews, and feedback.
+
+- **Efficient Data Transfer** : Uses optimized transfer objects to enhance performance in both HTTP requests and responses.
+
+- **JSON API Responses** : Returns all requests in a JSON format, ensuring consistent data representation.
+
+- **Customized Exception Handling** : Implements customized exception handling for improved user experience and error messaging.
+
+- **Request Body Validation** : Implements request body data validation to ensure data accuracy and security.
+
+- **Token-Based Auth and Authorization** : Enables authentication and authorization through the use of JSON Web Tokens (JWT) with Spring Security.
+
+- **Role-Based Access Control** : Implements role-specific access control to restrict resource access to authorized users.
+
+- **Security Measures** : Incorporates security measures such as JWT token expiration after 20 minutes and restricted admin registration to maintain system security.
+
+- **Database Administration** : Provides administration tools for managing the database.
+
+- **Product Categorization** : Implements product categorization for improved browsing experience.
+
+- **Product Filtering** : Allows customers to view products based on the tag "Customer's Best Choice" and products on discount sale.
+
+- **Order Management System** : Offers a platform for customers to place, view, cancel orders, make payments, and track order status including delivery, pickup, return, and replacement.
+
+- **Payment Method Management** : Allows administrators to add, revoke, and manage available payment methods.
+
+- **Sales and Revenue Reporting** : Enables generation and viewing of sales and revenue reports including top-selling and least-selling products, highest sold products by rating and price, and sales made in different time periods.
+
+
 ## Tech Stack
 
 - JAVA
