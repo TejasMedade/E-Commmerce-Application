@@ -18,11 +18,35 @@ To enhance the user experience, the API incorporates Spring Hypermedia as the En
 With its focus on performance, security, and user-friendliness, this API represents a cutting-edge solution for integrating e-commerce functionality into any application. Whether you are a developer seeking to add e-commerce capabilities to your existing application or a business looking for a powerful and customizable e-commerce platform, this API is the optimal choice.
 
 
-The API's Services  will be used by the **two** categories of users:
 
-- **Admin (Administrator)**
 
-- **User (Customer)**
+## Tech Stack
+
+- JAVA
+- SPRING
+- SPRINGBOOT
+- HIBERNATE
+- MAVEN
+- J.D.B.C
+- MYSQL
+- POSTMAN
+
+## Dependencies
+
+- JWT AUTHENTICATION
+- SPRING SECURITY
+- SPRING HATEOAS
+- SPRING DATA JPA
+- SPRING BOOT DEVTOOLS
+- SPRING WEB
+- HIBERNATE
+- MYSQL DRIVER
+- VALIDATION
+- LOMBOK
+- MODEL MAPPER
+- LOGGER
+
+
 
 
 ## Features
@@ -67,33 +91,7 @@ The API's Services  will be used by the **two** categories of users:
 - **Sales and Revenue Reporting** : Enables generation and viewing of sales and revenue reports including top-selling and least-selling products, highest sold products by rating and price, and sales made in different time periods.
 
 
-## Tech Stack
-
-- JAVA
-- SPRING
-- SPRINGBOOT
-- HIBERNATE
-- MAVEN
-- J.D.B.C
-- MYSQL
-- POSTMAN
-
-## Dependencies
-
-- JWT AUTHENTICATION
-- SPRING SECURITY
-- SPRING HATEOAS
-- SPRING DATA JPA
-- SPRING BOOT DEVTOOLS
-- SPRING WEB
-- HIBERNATE
-- MYSQL DRIVER
-- VALIDATION
-- LOMBOK
-- MODEL MAPPER
-- LOGGER
-
-## Administrator Side Features
+## Administrator Functionalities
 
  - **Administrator Management** 
 
@@ -165,7 +163,7 @@ The API's Services  will be used by the **two** categories of users:
 
 
 
-## User Side Features
+## Customer Functionalities
 
  - **Customer Management** 
 
