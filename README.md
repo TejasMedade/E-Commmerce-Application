@@ -267,25 +267,6 @@ System Generated Admin For Your Database
 }
 ```
 
-## Important Note
-
-- At present, Swagger does not support cookie-based authorization. The team will look into implementing it once Swagger provides the necessary features to support it.
-- When utilizing the PostMan software, ensure that the request includes embedded cookies as JWT authentication is implemented as a cookie-based authentication mechanism.
-
-- The roles have already been established within the database. Ensure that the appropriate requests are executed for both the Admin and User roles.
-
-- It's important to note that an Admin is also considered as a User. Only Users with Admin privileges have the ability to create additional Admins within the database.
-
-- The expiration time limit for JWT tokens is 20 minutes. Subsequently, a new login session is required after the 20-minute duration.
-- An additional 2% discount will be applied to the sale price of a product when it is added to a discount sale.
-
-- **Order cancellation policy**
-   - Order cancellation is only possible if the order has not yet been marked as delivered.
-- **Return policy**
-   - Orders that have been marked as delivered by the admin cannot be cancelled and must be returned.
-- **Refund and replacement policy**
-   - Refunds and replacements for orders can only be processed once the return order and its status have been marked as picked up by the admin.
-
 
 ## Run Locally
 
@@ -319,6 +300,28 @@ Open the following URL for Swagger-UI
 ```bash
 http://localhost:8088/swagger-ui/
 ```
+
+
+
+## Important Note
+
+- At present, Swagger does not support cookie-based authorization. The team will look into implementing it once Swagger provides the necessary features to support it.
+- When utilizing the PostMan software, ensure that the request includes embedded cookies as JWT authentication is implemented as a cookie-based authentication mechanism.
+
+- The roles have already been established within the database. Ensure that the appropriate requests are executed for both the Admin and User roles.
+
+- It's important to note that an Admin is also considered as a User. Only Users with Admin privileges have the ability to create additional Admins within the database.
+
+- The expiration time limit for JWT tokens is 20 minutes. Subsequently, a new login session is required after the 20-minute duration.
+- An additional 2% discount will be applied to the sale price of a product when it is added to a discount sale.
+
+- **Order cancellation policy**
+   - Order cancellation is only possible if the order has not yet been marked as delivered.
+- **Return policy**
+   - Orders that have been marked as delivered by the admin cannot be cancelled and must be returned.
+- **Refund and replacement policy**
+   - Refunds and replacements for orders can only be processed once the return order and its status have been marked as picked up by the admin.
+
 
 ## ER Diagram
 
