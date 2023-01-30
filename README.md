@@ -322,6 +322,7 @@ http://localhost:8088/swagger-ui/
 
 ## ER Diagram
 
+![ER_Diagram](https://user-images.githubusercontent.com/105907169/215553881-33438a04-b956-4547-87c8-d45a14365b3e.jpg)
 
 
 ## Demo
