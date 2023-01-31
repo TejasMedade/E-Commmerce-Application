@@ -189,7 +189,7 @@ public class CustomerController {
 		return new ResponseEntity<CustomerResponseDto>(customer, HttpStatus.OK);
 	}
 
-	@GetMapping("/{firstname}")
+	@GetMapping("/search/{firstname}")
 	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByfirstNameHandler(
 			@PathVariable("firstname") String firstName) throws ResourceNotFoundException, ResourceNotAllowedException {
 
@@ -213,7 +213,7 @@ public class CustomerController {
 
 	}
 
-	@GetMapping("/{lastname}")
+	@GetMapping("/search/{lastname}")
 	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchBylastName(
 			@PathVariable("lastname") String lastName) throws ResourceNotFoundException, ResourceNotAllowedException {
 
@@ -235,11 +235,34 @@ public class CustomerController {
 		return new ResponseEntity<CollectionModel<CustomerResponseDto>>(collectionModel, HttpStatus.OK);
 	}
 
-	@GetMapping("/{email}")
+	@GetMapping("/search/{email}")
 	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByEmailId(@PathVariable("email") String email)
 			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		List<CustomerResponseDto> pageResponse = this.customerService.searchByemailId(email);
+
+		for (CustomerResponseDto customerResponseDto : pageResponse) {
+
+			customerResponseDto
+					.add(linkTo(methodOn(CustomerController.class).getCustomerHandler(customerResponseDto.getContact()))
+							.withRel("customer"));
+		}
+
+		CollectionModel<CustomerResponseDto> collectionModel = CollectionModel.of(pageResponse);
+
+		// Collection
+		collectionModel.add(linkTo(methodOn(CustomerController.class).getAllCustomerDetailsHandler(null, null,
+				AppConstants.SORTDIRECTION, AppConstants.CUSTOMERSORTBY)).withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<CustomerResponseDto>>(collectionModel, HttpStatus.OK);
+
+	}
+
+	@GetMapping("/search/first/last")
+	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByFirstAndLastName(String firstName,
+			String lastName) throws ResourceNotFoundException, ResourceNotAllowedException {
+
+		List<CustomerResponseDto> pageResponse = this.customerService.searchByFirstAndLastName(firstName, lastName);
 
 		for (CustomerResponseDto customerResponseDto : pageResponse) {
 
