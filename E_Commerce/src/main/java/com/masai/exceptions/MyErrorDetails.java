@@ -5,14 +5,12 @@ package com.masai.exceptions;
 
 import java.time.LocalDateTime;
 
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * @author tejas
  *
  */
 
-@RestControllerAdvice
 public class MyErrorDetails {
 
 	private LocalDateTime timestamp;
