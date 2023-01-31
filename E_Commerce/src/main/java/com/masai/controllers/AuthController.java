@@ -5,6 +5,7 @@ package com.masai.controllers;
 
 import java.time.LocalDateTime;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
@@ -20,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -124,14 +126,35 @@ public class AuthController {
 
 	}
 
+	@PreAuthorize("hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')")
+	@GetMapping("/active")
+	public ResponseEntity<ApiResponse> getActiveUserName(HttpServletRequest request) {
+
+		String jwt = jwtUtils.getJwtFromCookies(request);
+
+
+		if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+
+			String username = jwtUtils.getUserNameFromJwtToken(jwt);
+
+
+			return new ResponseEntity<ApiResponse>(
+					new ApiResponse(LocalDateTime.now(), "Valid J.W.T. Token", true, username),
+					HttpStatus.OK);
+
+		} else {
+			return new ResponseEntity<ApiResponse>(new ApiResponse(LocalDateTime.now(), false, "Invalid J.W.T. Token"),
+					HttpStatus.NOT_ACCEPTABLE);
+		}
+
+	}
+
 	@PostMapping("/customers/signup")
 	public ResponseEntity<?> registerUserHandler(@Valid @RequestBody CustomerRequestDto customerRequestDto)
 			throws ResourceNotFoundException {
 
 		if (Boolean.TRUE.equals(this.customerRepo.existsByContact(customerRequestDto.getContact()))) {
-			
-			
-			
+
 			if (Boolean.TRUE.equals(this.customerRepo.existsByEmail(customerRequestDto.getEmail()))) {
 
 				return ResponseEntity.badRequest()
@@ -151,7 +174,7 @@ public class AuthController {
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
-	@PostMapping("/admin/signup")
+	@PostMapping("/admins/signup")
 	public ResponseEntity<?> registerAdminHandler(@Valid @RequestBody AdminRequestDto adminRequestDto)
 			throws ResourceNotFoundException {
 
