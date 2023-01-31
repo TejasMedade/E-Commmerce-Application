@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.masai.exceptions.ResourceNotFoundException;
+import com.masai.modelRequestDto.AdminUpdateRequestDto;
 import com.masai.modelResponseDto.AdminResponseDto;
 import com.masai.payloads.ApiResponse;
 import com.masai.services.AdminServices;
-import com.masai.services.AdminUpdateRequestDto;
 
 /**
  * @author tejas
