@@ -37,12 +37,5 @@ public class ResourceNotAllowedException extends Exception {
 	}
 	
 	
-	
-
-	
-	
-	
-
-	
 
 }
