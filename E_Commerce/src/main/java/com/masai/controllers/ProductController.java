@@ -126,6 +126,65 @@ public class ProductController {
 		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
 	}
 
+	@GetMapping("/all/onsale")
+	public ResponseEntity<CollectionModel<ProductResponseDto>> getProductsOnDiscountSale(
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+			@RequestParam(defaultValue = AppConstants.PRODUCTSORTBY, required = false) String sortBy,
+			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
+
+		Page<Product> pageResponse = this.productServices.getProductsOnDiscountSale(pageNumber, pageSize, sortBy,
+				sortDirection);
+
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
+	}
+
+	@GetMapping("/all/onchoice")
+	public ResponseEntity<CollectionModel<ProductResponseDto>> getProductsOnBuyersChoice(
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+			@RequestParam(defaultValue = AppConstants.PRODUCTSORTBY, required = false) String sortBy,
+			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
+
+		Page<Product> pageResponse = this.productServices.getProductsOnBuyersChoice(pageNumber, pageSize, sortBy,
+				sortDirection);
+
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
+
+	}
+
+	@GetMapping("/all/discount")
+	public ResponseEntity<CollectionModel<ProductResponseDto>> getProductsByDiscountPercentage(
+			@PathVariable("discountPercentage") Integer discountPercentage,
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+			@RequestParam(defaultValue = AppConstants.PRODUCTSORTBY, required = false) String sortBy,
+			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
+
+		Page<Product> pageResponse = this.productServices.getProductsByDiscountPercentage(discountPercentage,
+				pageNumber, pageSize, sortBy, sortDirection);
+
+		PagedModel<ProductResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, productModelAssembler);
+
+		// Collection Links
+		model.add(linkTo(methodOn(ProductController.class).getProductsByPageHandler(null, null))
+				.withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ProductResponseDto>>(model, HttpStatus.OK);
+	}
+
 	@GetMapping("/all/sort/rating")
 	public ResponseEntity<CollectionModel<ProductResponseDto>> getSortedProductsByRatingHandler(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
@@ -287,9 +346,9 @@ public class ProductController {
 
 	}
 
-	@GetMapping("/all/search")
+	@GetMapping("/all/search/{keyword}")
 	public ResponseEntity<CollectionModel<ProductResponseDto>> searchProductsByProductNameKeywordHandler(
-			@RequestParam String keyword) throws ResourceNotFoundException, ResourceNotAllowedException {
+			@PathVariable("keyword") String keyword) throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		List<ProductResponseDto> productsByProductNameKeyword = this.productServices
 				.searchProductsByProductNameKeyword(keyword);
