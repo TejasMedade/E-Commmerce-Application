@@ -27,16 +27,19 @@ import com.masai.exceptions.DuplicateResourceException;
 import com.masai.exceptions.ResourceNotAllowedException;
 import com.masai.exceptions.ResourceNotFoundException;
 import com.masai.model.Order;
+import com.masai.model.PickUpOrderRequest;
 import com.masai.model.RefundOrderRequest;
 import com.masai.model.ReplaceOrderRequest;
-import com.masai.modelResponseDto.OrderDetailsResponseDto;
+import com.masai.modelResponseDto.OrderResponseDto;
+import com.masai.modelResponseDto.PickUpOrderDetailsResponseDto;
 import com.masai.modelResponseDto.RefundOrderDetailsResponseDto;
 import com.masai.modelResponseDto.RefundOrderResponseDto;
 import com.masai.modelResponseDto.ReplaceOrderDetailsResponseDto;
 import com.masai.modelResponseDto.ReturnReplaceOrderResponseDto;
 import com.masai.payloads.ApiResponse;
 import com.masai.payloads.AppConstants;
-import com.masai.payloads.OrderDetailsModelAssembler;
+import com.masai.payloads.OrderResponseModelAssembler;
+import com.masai.payloads.PickUpOrderDetailsModelAssembler;
 import com.masai.payloads.RefundOrderDetailsModelAssembler;
 import com.masai.payloads.ReplaceOrderDetailsModelAssembler;
 import com.masai.services.OrderServices;
@@ -54,7 +57,7 @@ public class OrderController {
 	private OrderServices orderServices;
 
 	@Autowired
-	private OrderDetailsModelAssembler orderDetailsModelAssembler;
+	private OrderResponseModelAssembler orderResponseModelAssembler;
 
 	@Autowired
 	private PagedResourcesAssembler<Order> pagedResourcesAssembler;
@@ -71,6 +74,12 @@ public class OrderController {
 	@Autowired
 	private PagedResourcesAssembler<ReplaceOrderRequest> pagedReplaceResourcesAssembler;
 
+	@Autowired
+	private PickUpOrderDetailsModelAssembler pickUpOrderDetailsModelAssembler;
+
+	@Autowired
+	private PagedResourcesAssembler<PickUpOrderRequest> pagedPickupResourcesAssembler;
+
 	@PostMapping("/customers/{contact}/payments/{paymentId}/products/{productId}/{quantity}")
 	public ResponseEntity<ApiResponse> orderProduct(@PathVariable("contact") String contact,
 			@PathVariable("paymentId") Integer paymentId, @PathVariable("productId") Integer productId,
@@ -82,7 +91,7 @@ public class OrderController {
 	}
 
 	@GetMapping("/customers/{contact}")
-	public ResponseEntity<CollectionModel<OrderDetailsResponseDto>> getAllOrdersByCustomer(
+	public ResponseEntity<CollectionModel<OrderResponseDto>> getAllOrdersByCustomer(
 			@PathVariable("contact") String contact,
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
@@ -94,18 +103,17 @@ public class OrderController {
 		Page<Order> pageResponse = this.orderServices.getAllOrdersByCustomer(contact, pageNumber, pageSize, sortBy,
 				sortDirection);
 
-		PagedModel<OrderDetailsResponseDto> model = pagedResourcesAssembler.toModel(pageResponse,
-				orderDetailsModelAssembler);
+		PagedModel<OrderResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, orderResponseModelAssembler);
 
 		// Collection Link
 		model.add(linkTo(methodOn(OrderController.class).getAllOrders(null, null, AppConstants.ORDERSORTBY,
 				AppConstants.SORTDIRECTION)).withRel(IanaLinkRelations.COLLECTION));
 
-		return new ResponseEntity<CollectionModel<OrderDetailsResponseDto>>(model, HttpStatus.OK);
+		return new ResponseEntity<CollectionModel<OrderResponseDto>>(model, HttpStatus.OK);
 	}
 
 	@GetMapping("/")
-	public ResponseEntity<CollectionModel<OrderDetailsResponseDto>> getAllOrders(
+	public ResponseEntity<CollectionModel<OrderResponseDto>> getAllOrders(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.ORDERSORTBY, required = false) String sortBy,
@@ -113,17 +121,16 @@ public class OrderController {
 
 		Page<Order> pageResponse = this.orderServices.getAllOrders(pageNumber, pageSize, sortBy, sortDirection);
 
-		PagedModel<OrderDetailsResponseDto> model = pagedResourcesAssembler.toModel(pageResponse,
-				orderDetailsModelAssembler);
+		PagedModel<OrderResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, orderResponseModelAssembler);
 
 		// Collection Link
 		model.add(linkTo(methodOn(OrderController.class).getAllOrders(null, null, AppConstants.ORDERSORTBY,
 				AppConstants.SORTDIRECTION)).withRel(IanaLinkRelations.COLLECTION));
 
-		return new ResponseEntity<CollectionModel<OrderDetailsResponseDto>>(model, HttpStatus.OK);
+		return new ResponseEntity<CollectionModel<OrderResponseDto>>(model, HttpStatus.OK);
 	}
 
-	@DeleteMapping("admin/{orderId}/delete")
+	@DeleteMapping("/admin/{orderId}/delete")
 	public ResponseEntity<ApiResponse> deleteOrder(@PathVariable("orderId") Integer orderId)
 			throws ResourceNotFoundException {
 
@@ -133,10 +140,10 @@ public class OrderController {
 	}
 
 	@GetMapping("/{orderId}")
-	public ResponseEntity<OrderDetailsResponseDto> getOrderById(@PathVariable("orderId") Integer orderId)
+	public ResponseEntity<OrderResponseDto> getOrderById(@PathVariable("orderId") Integer orderId)
 			throws ResourceNotFoundException {
 
-		OrderDetailsResponseDto orderResponseDto = this.orderServices.getOrderByOrderId(orderId);
+		OrderResponseDto orderResponseDto = this.orderServices.getOrderByOrderId(orderId);
 
 		// Self Link
 		orderResponseDto
@@ -146,10 +153,10 @@ public class OrderController {
 		orderResponseDto.add(linkTo(methodOn(OrderController.class).getAllOrders(null, null, AppConstants.ORDERSORTBY,
 				AppConstants.SORTDIRECTION)).withRel(IanaLinkRelations.COLLECTION));
 
-		return new ResponseEntity<OrderDetailsResponseDto>(orderResponseDto, HttpStatus.OK);
+		return new ResponseEntity<OrderResponseDto>(orderResponseDto, HttpStatus.OK);
 	}
 
-	@PutMapping("admin/{orderId}/delivered")
+	@PutMapping("/admin/{orderId}/delivered")
 	public ResponseEntity<ApiResponse> markDelivered(@PathVariable("orderId") Integer orderId)
 			throws ResourceNotFoundException {
 
@@ -158,11 +165,11 @@ public class OrderController {
 		return new ResponseEntity<ApiResponse>(apiResponse, HttpStatus.OK);
 	}
 
-	@PutMapping("admin/{orderId}/{status}")
-	public ResponseEntity<OrderDetailsResponseDto> updateOrderStatus(@PathVariable("orderId") Integer orderId,
-			@PathVariable("status") String status) throws ResourceNotFoundException {
+	@PutMapping("/admin/{orderId}")
+	public ResponseEntity<OrderResponseDto> updateOrderStatus(@PathVariable("orderId") Integer orderId,
+			@RequestParam String status) throws ResourceNotFoundException {
 
-		OrderDetailsResponseDto orderResponseDto = this.orderServices.updateOrderStatus(orderId, status);
+		OrderResponseDto orderResponseDto = this.orderServices.updateOrderStatus(orderId, status);
 
 		// Self Link
 		orderResponseDto
@@ -172,7 +179,7 @@ public class OrderController {
 		orderResponseDto.add(linkTo(methodOn(OrderController.class).getAllOrders(null, null, AppConstants.ORDERSORTBY,
 				AppConstants.SORTDIRECTION)).withRel(IanaLinkRelations.COLLECTION));
 
-		return new ResponseEntity<OrderDetailsResponseDto>(orderResponseDto, HttpStatus.OK);
+		return new ResponseEntity<OrderResponseDto>(orderResponseDto, HttpStatus.OK);
 
 	}
 
@@ -269,19 +276,100 @@ public class OrderController {
 		return new ResponseEntity<CollectionModel<RefundOrderDetailsResponseDto>>(model, HttpStatus.OK);
 	}
 
+	@GetMapping("/admin/pickup/requests/pending")
+	public ResponseEntity<CollectionModel<PickUpOrderDetailsResponseDto>> getAllPendingPickupRequests(
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+			@RequestParam(defaultValue = AppConstants.PICKUPORDERSORTBY, required = false) String sortBy,
+			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
+
+		Page<PickUpOrderRequest> pageResponse = this.orderServices.getAllPendingPickupRequests(pageNumber, pageSize,
+				sortBy, sortDirection);
+
+		PagedModel<PickUpOrderDetailsResponseDto> model = pagedPickupResourcesAssembler.toModel(pageResponse,
+				pickUpOrderDetailsModelAssembler);
+
+		model.add(linkTo(methodOn(OrderController.class).getAllApprovedPickupRequests(pageNumber, pageSize, sortBy,
+				sortDirection)).withRel("approved requests"));
+
+		return new ResponseEntity<CollectionModel<PickUpOrderDetailsResponseDto>>(model, HttpStatus.OK);
+	}
+
+	@GetMapping("/admin/pickup/requests/approved")
+	public ResponseEntity<CollectionModel<PickUpOrderDetailsResponseDto>> getAllApprovedPickupRequests(
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+			@RequestParam(defaultValue = AppConstants.PICKUPORDERSORTBY, required = false) String sortBy,
+			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection) {
+
+		Page<PickUpOrderRequest> pageResponse = this.orderServices.getAllApprovedPickupRequests(pageNumber, pageSize,
+				sortBy, sortDirection);
+
+		PagedModel<PickUpOrderDetailsResponseDto> model = pagedPickupResourcesAssembler.toModel(pageResponse,
+				pickUpOrderDetailsModelAssembler);
+
+		model.add(linkTo(methodOn(OrderController.class).getAllApprovedPickupRequests(pageNumber, pageSize, sortBy,
+				sortDirection)).withRel("approved requests"));
+
+		return new ResponseEntity<CollectionModel<PickUpOrderDetailsResponseDto>>(model, HttpStatus.OK);
+
+	}
+	@GetMapping("/customers/{contact}/replaced")
+	public ResponseEntity<CollectionModel<ReplaceOrderDetailsResponseDto>> getAllReplacedOrdersByCustomer(@PathVariable("contact") String contact,
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+			@RequestParam(defaultValue = AppConstants.REPLACEORDERSORTBY, required = false) String sortBy,
+			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection)
+			throws ResourceNotFoundException {
+
+		Page<ReplaceOrderRequest> pageResponse = this.orderServices.getAllReplacedOrdersByCustomer(contact, pageNumber,
+				pageSize, sortBy, sortDirection);
+
+		PagedModel<ReplaceOrderDetailsResponseDto> model = pagedReplaceResourcesAssembler.toModel(pageResponse,
+				replaceOrderDetailsModelAssembler);
+
+		// Collection Link
+		model.add(linkTo(methodOn(OrderController.class).getAllOrders(pageNumber, pageSize, AppConstants.ORDERSORTBY,
+				AppConstants.SORTDIRECTION)).withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<ReplaceOrderDetailsResponseDto>>(model, HttpStatus.OK);
+	}
+	
+	@GetMapping("/customers/{contact}/refunded")
+	public ResponseEntity<CollectionModel<RefundOrderDetailsResponseDto>> getAllRefundOrdersByCustomer(
+			@PathVariable("contact") String contact,
+			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
+			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
+			@RequestParam(defaultValue = AppConstants.REFUNDORDERSORTBY, required = false) String sortBy,
+			@RequestParam(defaultValue = AppConstants.SORTDIRECTION, required = false) String sortDirection)
+			throws ResourceNotFoundException {
+
+		Page<RefundOrderRequest> pageResponse = this.orderServices.getAllRefundOrdersByCustomer(contact, pageNumber,
+				pageSize, sortBy, sortDirection);
+
+		PagedModel<RefundOrderDetailsResponseDto> model = pagedRefundResourcesAssembler.toModel(pageResponse,
+				refundOrderDetailsModelAssembler);
+
+		// Collection Link
+		model.add(linkTo(methodOn(OrderController.class).getAllOrders(pageNumber, pageSize, AppConstants.ORDERSORTBY,
+				AppConstants.SORTDIRECTION)).withRel(IanaLinkRelations.COLLECTION));
+
+		return new ResponseEntity<CollectionModel<RefundOrderDetailsResponseDto>>(model, HttpStatus.OK);
+	}
+
 	@PutMapping("/admin/refunds/{refundId}")
-	public ResponseEntity<RefundOrderResponseDto> approveRefundsById(
+	public ResponseEntity<RefundOrderResponseDto> approveRefundsById(@RequestParam String approvedBy,
 			@PathVariable("refundId") Integer refundOrderRequestId) throws ResourceNotFoundException {
 
-		RefundOrderResponseDto refundOrderResponseDto = this.orderServices.approveRefundById(refundOrderRequestId);
+		RefundOrderResponseDto refundOrderResponseDto = this.orderServices.approveRefundById(approvedBy,
+				refundOrderRequestId);
 
 		return new ResponseEntity<RefundOrderResponseDto>(refundOrderResponseDto, HttpStatus.ACCEPTED);
 	}
 
-	@PutMapping("/admin/replacements/requests/{replaceId}/{approvedby}")
-	public ResponseEntity<ReturnReplaceOrderResponseDto> approveReplacementRequest(
-			@PathVariable("approvedby") String approvedBy, @PathVariable("replaceId") Integer replaceOrderRequestId)
-			throws ResourceNotAllowedException, Exception {
+	@PutMapping("/admin/replacements/requests/{replaceId}")
+	public ResponseEntity<ReturnReplaceOrderResponseDto> approveReplacementRequest(@RequestParam String approvedBy,
+			@PathVariable("replaceId") Integer replaceOrderRequestId) throws Exception {
 
 		ReturnReplaceOrderResponseDto approveReplacementRequest = this.orderServices
 				.approveReplacementRequest(approvedBy, replaceOrderRequestId);
@@ -308,8 +396,8 @@ public class OrderController {
 
 	}
 
-	@PutMapping("/admin/pickups/requests/{orderId}/{pickedUpBy}")
-	public ResponseEntity<ApiResponse> revokeOrderPickUpStatus(@PathVariable("pickedUpBy") String pickedUpBy,
+	@PutMapping("/admin/pickups/requests/{orderId}")
+	public ResponseEntity<ApiResponse> revokeOrderPickUpStatus(@RequestParam("pickedUpBy") String pickedUpBy,
 			@PathVariable("orderId") Integer orderId) throws ResourceNotFoundException, DuplicateResourceException {
 
 		ApiResponse apiResponse = this.orderServices.revokeOrderPickUpStatus(pickedUpBy, orderId);
