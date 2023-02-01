@@ -37,7 +37,7 @@ public class AddressServicesImplementation implements AddressServices {
 
 		Customer customer = this.customerRepo.findByContact(customerContact)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer", "Contact Number", customerContact));
-
+		
 		Address address = customer.getAddress();
 
 		if (addressUpdateRequestDto.getAddressLine1() != null) {
@@ -98,7 +98,7 @@ public class AddressServicesImplementation implements AddressServices {
 
 		Customer customer = this.customerRepo.findByContact(customerContact)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer", "Contact Number", customerContact));
-
+		
 		Address address = this.toAddress(addressRequestDto);
 
 		customer.setAddress(address);
