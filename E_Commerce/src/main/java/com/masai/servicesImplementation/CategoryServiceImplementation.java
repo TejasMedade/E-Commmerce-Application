@@ -6,6 +6,7 @@ package com.masai.servicesImplementation;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,12 +14,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 import com.masai.exceptions.ResourceNotFoundException;
 import com.masai.model.Category;
 import com.masai.modelRequestDto.CategoryRequestDto;
+import com.masai.modelRequestDto.CategoryUpdateRequestDto;
 import com.masai.modelResponseDto.CategoryResponseDto;
 import com.masai.payloads.ApiResponse;
-import com.masai.payloads.PageResponse;
 import com.masai.repositories.CategoryRepo;
 import com.masai.services.CategoryServices;
 
@@ -46,7 +48,7 @@ public class CategoryServiceImplementation implements CategoryServices {
 	}
 
 	@Override
-	public CategoryResponseDto updateCategory(Integer categoryId, CategoryRequestDto categoryRequestDto)
+	public CategoryResponseDto updateCategory(Integer categoryId, CategoryUpdateRequestDto categoryRequestDto)
 			throws ResourceNotFoundException {
 
 		Category category = this.categoryRepo.findById(categoryId)
@@ -56,10 +58,9 @@ public class CategoryServiceImplementation implements CategoryServices {
 			category.setCategoryName(categoryRequestDto.getCategoryName());
 		}
 		if (categoryRequestDto.getCategoryDescription() != null) {
+			category.setCategoryDescription(categoryRequestDto.getCategoryDescription());
 		}
-		if (categoryRequestDto.getSubCategory() != null) {
-			category.setSubCategory(categoryRequestDto.getSubCategory());
-		}
+
 		if (categoryRequestDto.getActive() != null) {
 			category.setActive(categoryRequestDto.getActive());
 		}
@@ -77,7 +78,7 @@ public class CategoryServiceImplementation implements CategoryServices {
 
 		this.categoryRepo.delete(category);
 
-		return new ApiResponse(LocalDateTime.now(), "Category Deleted Successfully !", true);
+		return new ApiResponse(LocalDateTime.now(), "Category Deleted Successfully !", true, category);
 	}
 
 	@Override
@@ -94,39 +95,21 @@ public class CategoryServiceImplementation implements CategoryServices {
 
 		List<Category> list = this.categoryRepo.findAll();
 
-		List<CategoryResponseDto> listOfCategories = list.stream().map(c -> this.toCategoryResponseDto(c))
-				.collect(Collectors.toList());
-
-		return listOfCategories;
+		return list.stream().map(this::toCategoryResponseDto).collect(Collectors.toList());
 	}
 
 	@Override
-	public PageResponse getAllCategoriesByPage(Integer page, Integer size) {
+	public Page<Category> getAllCategoriesByPage(Integer page, Integer size) {
 
 		Pageable pageable;
 		pageable = PageRequest.of(page, size);
 
-		Page<Category> categoryPage = this.categoryRepo.findAll(pageable);
+		return this.categoryRepo.findAll(pageable);
 
-		List<Category> content = categoryPage.getContent();
-
-		List<CategoryResponseDto> listOfCategories = content.stream().map(this::toCategoryResponseDto)
-				.collect(Collectors.toList());
-
-		PageResponse pageResponse = new PageResponse();
-
-		pageResponse.setContent(listOfCategories);
-		pageResponse.setLastPage(categoryPage.isLast());
-		pageResponse.setPageNumber(categoryPage.getNumber());
-		pageResponse.setPageSize(categoryPage.getSize());
-		pageResponse.setTotalPages(categoryPage.getTotalPages());
-		pageResponse.setTotalElements(categoryPage.getTotalElements());
-
-		return pageResponse;
 	}
 
 	@Override
-	public PageResponse getSortedByAnyCategoryDetailsByPage(Integer page, Integer size, String sortBy,
+	public Page<Category> getSortedByAnyCategoryDetailsByPage(Integer page, Integer size, String sortBy,
 			String sortDirection) {
 
 		Sort sort;
@@ -135,23 +118,7 @@ public class CategoryServiceImplementation implements CategoryServices {
 		Pageable pageable;
 		pageable = PageRequest.of(page, size, sort);
 
-		Page<Category> categoryPage = this.categoryRepo.findAll(pageable);
-
-		List<Category> content = categoryPage.getContent();
-
-		List<CategoryResponseDto> listOfCategories = content.stream().map(this::toCategoryResponseDto)
-				.collect(Collectors.toList());
-
-		PageResponse pageResponse = new PageResponse();
-
-		pageResponse.setContent(listOfCategories);
-		pageResponse.setLastPage(categoryPage.isLast());
-		pageResponse.setPageNumber(categoryPage.getNumber());
-		pageResponse.setPageSize(categoryPage.getSize());
-		pageResponse.setTotalPages(categoryPage.getTotalPages());
-		pageResponse.setTotalElements(categoryPage.getTotalElements());
-
-		return pageResponse;
+		return this.categoryRepo.findAll(pageable);
 
 	}
 
@@ -160,20 +127,19 @@ public class CategoryServiceImplementation implements CategoryServices {
 
 		List<Category> list = this.categoryRepo.findByCategoryNameContaining(keyword);
 
-		return list.stream().map(this::toCategoryResponseDto)
-				.collect(Collectors.toList());
+		return list.stream().map(this::toCategoryResponseDto).collect(Collectors.toList());
 	}
 
 	private Category toCategory(CategoryRequestDto categoryRequestDto) {
-		
+
 		return this.modelMapper.map(categoryRequestDto, Category.class);
-	
+
 	}
 
 	private CategoryResponseDto toCategoryResponseDto(Category category) {
-	
+
 		return this.modelMapper.map(category, CategoryResponseDto.class);
-	
+
 	}
 
 }
