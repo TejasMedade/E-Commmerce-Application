@@ -116,8 +116,7 @@ public class ECommerceApplication implements CommandLineRunner {
 		addPayments();
 		// Category Methods
 		addCategory();
-		
-		
+
 	}
 
 	public void addCategory() {
@@ -151,10 +150,17 @@ public class ECommerceApplication implements CommandLineRunner {
 
 		for (Category category : listofcategories) {
 
-			Category savedCategory = this.categoryRepo.save(category);
+			if (Boolean.TRUE.equals(this.categoryRepo.existsByCategoryNameIgnoreCase(category.getCategoryName()))) {
 
-			CategoryResponseDto categoryResponseDto = this.modelMapper().map(savedCategory, CategoryResponseDto.class);
-			System.out.println("New Caytegory Added : " + categoryResponseDto);
+			} else {
+
+				Category savedCategory = this.categoryRepo.save(category);
+
+				CategoryResponseDto categoryResponseDto = this.modelMapper().map(savedCategory,
+						CategoryResponseDto.class);
+				System.out.println("New Caytegory Added : " + categoryResponseDto);
+
+			}
 
 		}
 
@@ -190,15 +196,15 @@ public class ECommerceApplication implements CommandLineRunner {
 
 		Payment netBanking = new Payment();
 
-		credit.setPaymentId(105);
-		credit.setPaymentType("Net Banking");
-		credit.setAllowed(true);
+		netBanking.setPaymentId(105);
+		netBanking.setPaymentType("Net Banking");
+		netBanking.setAllowed(true);
 
 		Payment wallet = new Payment();
 
-		credit.setPaymentId(106);
-		credit.setPaymentType("BestBuy Wallet");
-		credit.setAllowed(true);
+		wallet.setPaymentId(106);
+		wallet.setPaymentType("BestBuy Wallet");
+		wallet.setAllowed(true);
 
 		listofpayments.add(credit);
 		listofpayments.add(debit);
@@ -209,9 +215,17 @@ public class ECommerceApplication implements CommandLineRunner {
 
 		for (Payment payment : listofpayments) {
 
-			Payment savedPayment = this.paymentRepo.save(payment);
-			System.out.println(
-					"New Payment Method Added : " + this.modelMapper().map(savedPayment, PaymentResponseDto.class));
+			System.out.println(payment.getPaymentId());
+
+			if (this.paymentRepo.existsById(payment.getPaymentId())) {
+
+			} else {
+				Payment savedPayment = this.paymentRepo.save(payment);
+				System.out.println(
+						"New Payment Method Added : " + this.modelMapper().map(savedPayment, PaymentResponseDto.class));
+
+			}
+
 		}
 
 	}
