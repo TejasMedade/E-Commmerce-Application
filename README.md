@@ -340,7 +340,7 @@ http://localhost:8088
 ```
 ## Login Logout API Reference
 
-![image](https://user-images.githubusercontent.com/105907169/215348560-f18b426c-f90f-4152-928e-a51e245bb7d9.png)
+![image](https://user-images.githubusercontent.com/105907169/216280259-cfc18b64-2684-4488-9426-0ed409f4ed8e.png)
 
 
 ## Admin API Reference
@@ -349,8 +349,7 @@ http://localhost:8088
 
 
 ## Customer API Reference
-
-![image](https://user-images.githubusercontent.com/105907169/215348630-2f14dd7a-7f24-475e-8c6d-d48809378b30.png)
+![image](https://user-images.githubusercontent.com/105907169/216280704-67a52dfa-a799-47d1-bd34-b15e87b90182.png)
 
 
 ## Address API Reference
@@ -367,7 +366,7 @@ http://localhost:8088
 
 ## Product API Reference
 
-![image](https://user-images.githubusercontent.com/105907169/215348682-3c36e8df-ab1f-412e-81b0-76514b4fe43d.png)
+![image](https://user-images.githubusercontent.com/105907169/216281712-6c8475a5-17a4-4899-9b43-81c5e5b64e5d.png)
 
 
 
@@ -379,7 +378,7 @@ http://localhost:8088
 
 
 ## Order API Reference
-![image](https://user-images.githubusercontent.com/105907169/215348736-a20348b0-2295-4ff3-bd80-947ddb1323ff.png)
+![image](https://user-images.githubusercontent.com/105907169/216281277-5406b5c9-dde0-4275-8b9d-332a64e72e2f.png)
 
 
 ## Feedback API Reference
