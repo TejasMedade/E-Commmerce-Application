@@ -328,13 +328,14 @@ http://localhost:8088/swagger-ui/
 ![ER_Diagram](https://user-images.githubusercontent.com/105907169/215553881-33438a04-b956-4547-87c8-d45a14365b3e.jpg)
 
 
-## Demo
+## PostMan Documentation
+
+Check Out the Below Given Link For Documentation with all API Requests, Responses, Headers & Request Body. 
+
+**POSTMAN DOCUMENTATION** : https://documenter.getpostman.com/view/24342917/2s935kQSBZ
 
 
-
-
-
-## URL
+## Base Url
 ```bash
 http://localhost:8088
 ```
