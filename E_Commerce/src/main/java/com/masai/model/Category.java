@@ -3,6 +3,7 @@
  */
 package com.masai.model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,8 +13,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,18 +35,23 @@ import lombok.NoArgsConstructor;
 public class Category {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "catgeoryId_generator")
-	@SequenceGenerator(name = "catgeoryId_generator", sequenceName = "categoryId_sequence", allocationSize = 5001)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer categoryId;
 
 	private String categoryName;
 
-	private String subCategory;
-	
-	@Column(length = Integer.MAX_VALUE)
+	@Lob
 	private String categoryDescription;
 
 	private Boolean active;
+	
+	@CreationTimestamp
+	@Column(nullable = false,updatable = false)
+	private LocalDateTime categoryAddedDateTime;
+
+	@UpdateTimestamp
+	@Column(nullable = false)
+	private LocalDateTime categoryUpdatedDateTime;
 
 	@OneToMany(cascade = CascadeType.ALL)
 	private List<Product> listOfProducts = new ArrayList<>();
