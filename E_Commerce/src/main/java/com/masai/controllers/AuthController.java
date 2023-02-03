@@ -132,15 +132,12 @@ public class AuthController {
 
 		String jwt = jwtUtils.getJwtFromCookies(request);
 
-
 		if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
 
 			String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
-
 			return new ResponseEntity<ApiResponse>(
-					new ApiResponse(LocalDateTime.now(), "Valid J.W.T. Token", true, username),
-					HttpStatus.OK);
+					new ApiResponse(LocalDateTime.now(), "Valid J.W.T. Token", true, username), HttpStatus.OK);
 
 		} else {
 			return new ResponseEntity<ApiResponse>(new ApiResponse(LocalDateTime.now(), false, "Invalid J.W.T. Token"),
@@ -155,22 +152,26 @@ public class AuthController {
 
 		if (Boolean.TRUE.equals(this.customerRepo.existsByContact(customerRequestDto.getContact()))) {
 
+			return ResponseEntity.badRequest()
+					.body(new DuplicateResourceException("Customer", "Contact", customerRequestDto.getContact()));
+
+		} else {
+
 			if (Boolean.TRUE.equals(this.customerRepo.existsByEmail(customerRequestDto.getEmail()))) {
 
 				return ResponseEntity.badRequest()
 						.body(new DuplicateResourceException("Customer", "Email Id", customerRequestDto.getEmail()));
 
+			} else {
+
+				CustomerDetailsResponseDto customerDetailsResponseDto = this.customerServices
+						.registerCustomer(customerRequestDto);
+
+				return new ResponseEntity<CustomerDetailsResponseDto>(customerDetailsResponseDto, HttpStatus.CREATED);
+
 			}
 
-			return ResponseEntity.badRequest()
-					.body(new DuplicateResourceException("Customer", "Contact", customerRequestDto.getContact()));
-
 		}
-
-		CustomerDetailsResponseDto customerDetailsResponseDto = this.customerServices
-				.registerCustomer(customerRequestDto);
-
-		return new ResponseEntity<CustomerDetailsResponseDto>(customerDetailsResponseDto, HttpStatus.CREATED);
 	}
 
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -178,16 +179,28 @@ public class AuthController {
 	public ResponseEntity<?> registerAdminHandler(@Valid @RequestBody AdminRequestDto adminRequestDto)
 			throws ResourceNotFoundException {
 
-		if (Boolean.TRUE.equals(this.customerRepo.existsByEmail(adminRequestDto.getEmail()))) {
+		if (Boolean.TRUE.equals(this.customerRepo.existsByContact(adminRequestDto.getContact()))) {
 
-			return new ResponseEntity<>(new DuplicateResourceException("Admin", "Email Id", adminRequestDto.getEmail()),
-					HttpStatus.BAD_REQUEST);
+			return ResponseEntity.badRequest().body(new DuplicateResourceException("Another Admin / Customer",
+					"Contact", adminRequestDto.getContact()));
+
+		} else {
+
+			if (Boolean.TRUE.equals(this.customerRepo.existsByEmail(adminRequestDto.getEmail()))) {
+
+				return new ResponseEntity<>(new DuplicateResourceException("Another Admin / Customer", "Email Id",
+						adminRequestDto.getEmail()), HttpStatus.BAD_REQUEST);
+
+			} else {
+				
+				AdminResponseDto adminResponseDto = this.adminServices.registerAdmin(adminRequestDto);
+
+				return new ResponseEntity<AdminResponseDto>(adminResponseDto, HttpStatus.CREATED);
+
+			}
 
 		}
 
-		AdminResponseDto adminResponseDto = this.adminServices.registerAdmin(adminRequestDto);
-
-		return new ResponseEntity<AdminResponseDto>(adminResponseDto, HttpStatus.CREATED);
 	}
 
 }
