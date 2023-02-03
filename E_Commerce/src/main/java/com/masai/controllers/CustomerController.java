@@ -189,7 +189,7 @@ public class CustomerController {
 		return new ResponseEntity<CustomerResponseDto>(customer, HttpStatus.OK);
 	}
 
-	@GetMapping("/search/{firstname}")
+	@GetMapping("/search/first/{firstname}")
 	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByfirstNameHandler(
 			@PathVariable("firstname") String firstName) throws ResourceNotFoundException, ResourceNotAllowedException {
 
@@ -213,7 +213,7 @@ public class CustomerController {
 
 	}
 
-	@GetMapping("/search/{lastname}")
+	@GetMapping("/search/last/{lastname}")
 	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchBylastName(
 			@PathVariable("lastname") String lastName) throws ResourceNotFoundException, ResourceNotAllowedException {
 
@@ -235,7 +235,7 @@ public class CustomerController {
 		return new ResponseEntity<CollectionModel<CustomerResponseDto>>(collectionModel, HttpStatus.OK);
 	}
 
-	@GetMapping("/search/{email}")
+	@GetMapping("/search/email/{email}")
 	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByEmailId(@PathVariable("email") String email)
 			throws ResourceNotFoundException, ResourceNotAllowedException {
 
@@ -259,8 +259,8 @@ public class CustomerController {
 	}
 
 	@GetMapping("/search/first/last")
-	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByFirstAndLastName(String firstName,
-			String lastName) throws ResourceNotFoundException, ResourceNotAllowedException {
+	public ResponseEntity<CollectionModel<CustomerResponseDto>> searchByFirstAndLastName(@RequestParam(required = true) String firstName,
+			@RequestParam(required = true) String lastName) throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		List<CustomerResponseDto> pageResponse = this.customerService.searchByFirstAndLastName(firstName, lastName);
 
