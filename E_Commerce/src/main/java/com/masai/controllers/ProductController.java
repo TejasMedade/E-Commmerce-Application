@@ -165,7 +165,7 @@ public class ProductController {
 
 	}
 
-	@GetMapping("/all/discount")
+	@GetMapping("/all/discount/{discountPercentage}")
 	public ResponseEntity<CollectionModel<ProductResponseDto>> getProductsByDiscountPercentage(
 			@PathVariable("discountPercentage") Integer discountPercentage,
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
