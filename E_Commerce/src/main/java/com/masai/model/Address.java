@@ -3,10 +3,16 @@
  */
 package com.masai.model;
 
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,6 +48,14 @@ public class Address {
 	private String country;
 	
 	private String pincode;
+	
+	@CreationTimestamp
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime addressCreatedDate;
 
+	@UpdateTimestamp
+	@Column(nullable = false)
+	private LocalDateTime addressUpdatedDate;
+	
 	
 }
