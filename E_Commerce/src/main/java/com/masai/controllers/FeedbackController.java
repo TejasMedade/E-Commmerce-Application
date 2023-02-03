@@ -282,7 +282,7 @@ public class FeedbackController {
 			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		Page<Feedback> pageResponse = this.feedbackServices.getFeedbacksByCustomer(contact, pageNumber, pageSize,
-				sortDirection, sortBy);
+				sortDirection,sortBy);
 
 		PagedModel<FeedbackResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, feedbackModelAssembler);
 
@@ -319,7 +319,7 @@ public class FeedbackController {
 			throws ResourceNotFoundException, ResourceNotAllowedException {
 
 		Page<Feedback> pageResponse = this.feedbackServices.getFeedbacksByOrder(orderId, pageNumber, pageSize,
-				sortDirection, sortDirection);
+				sortDirection, sortBy);
 
 		PagedModel<FeedbackResponseDto> model = pagedResourcesAssembler.toModel(pageResponse, feedbackModelAssembler);
 
@@ -347,7 +347,7 @@ public class FeedbackController {
 	}
 
 	@GetMapping("/sortby/ratings")
-	public ResponseEntity<CollectionModel<FeedbackResponseDto>> getAllFeedbacksByRating(
+	public ResponseEntity<CollectionModel<FeedbackResponseDto>> getAllFeedbacksSortedByRating(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
@@ -384,7 +384,7 @@ public class FeedbackController {
 	}
 
 	@GetMapping("/sortby/dates")
-	public ResponseEntity<CollectionModel<FeedbackResponseDto>> getAllFeedbacksByDate(
+	public ResponseEntity<CollectionModel<FeedbackResponseDto>> getAllFeedbacksSortedByDate(
 			@RequestParam(defaultValue = AppConstants.PAGENUMBER, required = false) Integer pageNumber,
 			@RequestParam(defaultValue = AppConstants.PAGESIZE, required = false) Integer pageSize,
 			@RequestParam(defaultValue = AppConstants.RATINGSORTDIRECTION, required = false) String sortDirection)
