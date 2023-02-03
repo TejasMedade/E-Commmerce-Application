@@ -4,15 +4,22 @@
 package com.masai.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Max;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
@@ -20,6 +27,7 @@ import lombok.NoArgsConstructor;
  *
  */
 @Entity
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class Review {
@@ -30,12 +38,18 @@ public class Review {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer reviewId;
 
-	@Column(length = Integer.MAX_VALUE)
+	@Lob
 	private String customerReview;
 
-	private Integer customerRating;
+	@Max(5)
+	private Double customerRating;
+	
+	@ElementCollection
+	private List<Image> images;
 
-	private LocalDateTime timestamp;
+	@CreationTimestamp
+	@Column(nullable = false, updatable = false)
+	private LocalDateTime reviewTimeStamp;
 
 	@ManyToOne
 	private Customer customer;
