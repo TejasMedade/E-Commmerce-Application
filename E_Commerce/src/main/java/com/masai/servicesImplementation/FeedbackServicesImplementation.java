@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import com.masai.exceptions.FileTypeNotValidException;
+import com.masai.exceptions.ResourceNotAllowedException;
 import com.masai.exceptions.ResourceNotFoundException;
 import com.masai.model.Customer;
 import com.masai.model.Feedback;
@@ -87,6 +88,7 @@ public class FeedbackServicesImplementation implements FeedbackServices {
 		Feedback savedFeedback = this.feedbackRepo.save(feedback);
 
 		return this.toFeedbackResponseDto(savedFeedback);
+
 	}
 
 	@Override
@@ -257,14 +259,13 @@ public class FeedbackServicesImplementation implements FeedbackServices {
 	}
 
 	@Override
-	public Page<Feedback> getFeedbacksByCustomer(String contact, Integer page, Integer size,
-			String sortDirection, String sortBy) throws ResourceNotFoundException {
+	public Page<Feedback> getFeedbacksByCustomer(String contact, Integer page, Integer size, String sortDirection,
+			String sortBy) throws ResourceNotFoundException {
 
 		Customer customer = this.customerRepo.findByContact(contact)
 				.orElseThrow(() -> new ResourceNotFoundException("Customer", "Contact Number", contact));
 
-		Sort sort = sortDirection.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
-				: Sort.by(sortBy).descending();
+		Sort sort = sortDirection.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
 		Pageable pageable = PageRequest.of(page, size, sort);
 
@@ -274,19 +275,17 @@ public class FeedbackServicesImplementation implements FeedbackServices {
 	}
 
 	@Override
-	public Page<Feedback> getFeedbacksByOrder(Integer orderId,Integer page, Integer size,
-			String sortDirection, String sortBy)
-			throws ResourceNotFoundException {
+	public Page<Feedback> getFeedbacksByOrder(Integer orderId, Integer page, Integer size, String sortDirection,
+			String sortBy) throws ResourceNotFoundException {
 
 		Order order = this.orderRepo.findById(orderId)
 				.orElseThrow(() -> new ResourceNotFoundException("Order", "Order Id", orderId));
-		
-		Sort sort = sortDirection.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending()
-				: Sort.by(sortBy).descending();
+
+		Sort sort = sortDirection.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
 
 		Pageable pageable = PageRequest.of(page, size, sort);
-		
-		return this.feedbackRepo.findByOrder(order,pageable);
+
+		return this.feedbackRepo.findByOrder(order, pageable);
 	}
 
 	@Override
