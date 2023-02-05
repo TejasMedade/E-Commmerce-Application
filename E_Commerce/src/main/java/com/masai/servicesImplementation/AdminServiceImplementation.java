@@ -4,6 +4,7 @@
 package com.masai.servicesImplementation;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -14,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.masai.exceptions.ResourceNotFoundException;
+import com.masai.model.Cart;
+import com.masai.model.CartProductDetails;
 import com.masai.model.Customer;
 import com.masai.model.Role;
 import com.masai.modelRequestDto.AdminRequestDto;
@@ -46,9 +49,9 @@ public class AdminServiceImplementation implements AdminServices {
 
 	@Override
 	public AdminResponseDto registerAdmin(AdminRequestDto adminRequestDto) throws ResourceNotFoundException {
-
+		
 		Customer customer = this.toAdmin(adminRequestDto);
-
+		
 		// Can set Customer for a single role as well
 
 		Set<Role> roles = customer.getRoles();
@@ -66,7 +69,18 @@ public class AdminServiceImplementation implements AdminServices {
 
 		// Encoding Password
 		customer.setPassword(passwordEncoder.encode(adminRequestDto.getPassword()));
+		
+			
+		Cart cart = new Cart();
 
+		List<CartProductDetails> listOfProducts = new ArrayList<>();
+
+		cart.setCartQuantity(0);
+		cart.setCartTotalAmount(0.0);
+		cart.setListOfProducts(listOfProducts);
+		
+		customer.setCart(cart);
+		
 		Customer savedAdmin = this.customerRepo.save(customer);
 
 		return toAdminResponseDto(savedAdmin);
