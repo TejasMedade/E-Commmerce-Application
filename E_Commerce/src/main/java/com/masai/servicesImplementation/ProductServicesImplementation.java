@@ -321,8 +321,8 @@ public class ProductServicesImplementation implements ProductServices {
 	@Override
 	public Page<Product> getSortedProductsByAddedDate(Integer page, Integer size, String sortDirection) {
 
-		Sort sort = sortDirection.equalsIgnoreCase("asc") ? Sort.by("productAddedDate").ascending()
-				: Sort.by("productAddedDate").descending();
+		Sort sort = sortDirection.equalsIgnoreCase("asc") ? Sort.by("productAddedDateTime").ascending()
+				: Sort.by("productAddedDateTime").descending();
 
 		Pageable pageable = PageRequest.of(page, size, sort);
 
