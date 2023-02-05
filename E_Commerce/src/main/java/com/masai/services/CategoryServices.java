@@ -5,11 +5,14 @@ package com.masai.services;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+
 import com.masai.exceptions.ResourceNotFoundException;
+import com.masai.model.Category;
 import com.masai.modelRequestDto.CategoryRequestDto;
+import com.masai.modelRequestDto.CategoryUpdateRequestDto;
 import com.masai.modelResponseDto.CategoryResponseDto;
 import com.masai.payloads.ApiResponse;
-import com.masai.payloads.PageResponse;
 
 /**
  * @author tejas
@@ -22,18 +25,20 @@ public interface CategoryServices {
 
 	CategoryResponseDto addCategory(CategoryRequestDto categoryRequestDto);
 
-	CategoryResponseDto updateCategory(Integer categoryId, CategoryRequestDto categoryRequestDto)
-			throws ResourceNotFoundException;
 
 	ApiResponse deleteCategoryById(Integer categoryId) throws ResourceNotFoundException;
 
 	CategoryResponseDto getCategory(Integer categoryId) throws ResourceNotFoundException;
 
-	PageResponse getAllCategoriesByPage(Integer page, Integer size);
+	Page<Category> getAllCategoriesByPage(Integer page, Integer size);
 
-	PageResponse getSortedByAnyCategoryDetailsByPage(Integer page, Integer size, String sortBy, String sortDirection);
+	Page<Category> getSortedByAnyCategoryDetailsByPage(Integer page, Integer size, String sortBy, String sortDirection);
 
 	List<CategoryResponseDto> searchCategoriesByKeyword(String keyword);
+
+
+	CategoryResponseDto updateCategory(Integer categoryId, CategoryUpdateRequestDto categoryRequestDto)
+			throws ResourceNotFoundException;
 
 
 
