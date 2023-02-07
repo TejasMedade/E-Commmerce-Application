@@ -8,7 +8,8 @@ import com.masai.model.Category;
 
 @Repository
 public interface CategoryRepo extends JpaRepository<Category, Integer> {
-	
+
 	List<Category> findByCategoryNameContaining(String keyword);
-	
+
+	Boolean existsByCategoryNameIgnoreCase(String categoryName);
 }
