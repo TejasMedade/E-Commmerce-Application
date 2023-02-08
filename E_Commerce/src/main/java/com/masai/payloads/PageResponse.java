@@ -1,7 +1,6 @@
 package com.masai.payloads;
 
-import java.util.List;
-
+import org.springframework.data.domain.Sort;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PageResponse {
 
-	private List<?> content;
+	private Object content;
+
+	private Boolean isEmpty;
 
 	private Integer pageNumber;
 
@@ -22,5 +23,8 @@ public class PageResponse {
 
 	private Long totalElements;
 
-	private boolean lastPage;
+	private Boolean lastPage;
+
+	private Sort sort;
+
 }
