@@ -1,8 +1,11 @@
 package com.masai.modelResponseDto;
 
-import java.time.LocalDate;
-import java.time.YearMonth;
+import java.time.LocalDateTime;
 import java.util.List;
+
+import org.springframework.hateoas.RepresentationModel;
+
+import com.masai.model.Image;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,13 +14,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductResponseDto {
+public class ProductResponseDto extends RepresentationModel<ProductResponseDto> {
 
 	private Integer productId;
 
 	private String productName;
 
 	private String productDescription;
+
+	private String productTechnicalDetails;
 
 	private String brand;
 
@@ -31,7 +36,7 @@ public class ProductResponseDto {
 
 	private Integer stockQuantity;
 
-	private Integer rating;
+	private Double rating;
 
 	private Boolean available;
 
@@ -39,11 +44,20 @@ public class ProductResponseDto {
 
 	private Boolean buyerschoice;
 
-	private List<String> images;
+	private List<Image> images;
 
-	private YearMonth manufacturingMonthYear;
+	private Integer manufacturingYear;
 
-	private LocalDate productAddedDate;
+	private Integer manufacturingMonth;
 
-	private CategoryResponseDto categoryResponseDto;
+	private LocalDateTime productAddedDateTime;
+
+	private LocalDateTime productUpdatedDateTime;
+
+	private ProductCategoryResponseDto category;
+
+	private List<ReviewResponseDto> listOfReviews;
+	
+	private Long totalSales;
+
 }
