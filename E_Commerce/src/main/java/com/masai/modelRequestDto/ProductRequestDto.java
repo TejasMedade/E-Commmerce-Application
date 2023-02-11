@@ -1,14 +1,9 @@
 package com.masai.modelRequestDto;
 
-import java.time.LocalDate;
-import java.time.YearMonth;
-
-import javax.persistence.Column;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,6 +24,11 @@ public class ProductRequestDto {
 	@NotEmpty(message = "{Product.description.invalid}")
 	private String productDescription;
 
+	@NotNull(message = "{Product.technicalDetails.invalid}")
+	@NotBlank(message = "{Product.technicalDetails.invalid}")
+	@NotEmpty(message = "{Product.technicalDetails.invalid}")
+	private String productTechnicalDetails;
+
 	@NotNull(message = "{Product.brand.invalid}")
 	@NotBlank(message = "{Product.brand.invalid}")
 	@NotEmpty(message = "{Product.brand.invalid}")
@@ -38,9 +38,6 @@ public class ProductRequestDto {
 	@NotBlank(message = "{Product.type.invalid}")
 	@NotEmpty(message = "{Product.type.invalid}")
 	private String type;
-
-	@NotNull(message = "{Product.salePrice.invalid}")
-	private Double salePrice;
 
 	@NotNull(message = "{Product.marketPrice.invalid}")
 	private Double marketPrice;
@@ -53,23 +50,12 @@ public class ProductRequestDto {
 
 	@Max(5)
 	@NotNull(message = "{Product.rating.invalid}")
-	private Integer rating;
+	private Double rating;
 
-	@NotNull(message = "{Product Availability Should be True or False}")
-	private Boolean available;
+	@NotNull(message = "{Product.manufacturingYear.invalid}")
+	private Integer manufacturingYear;
 
-	@NotNull(message = "{Product On Sale or Discount Should be True or False}")
-	private Boolean onDiscountSale;
-
-	@NotNull(message = "{Customer's Best Choice Should be True or False}")
-	private Boolean buyerschoice;
-
-	@NotNull
-	@PastOrPresent(message = "Year of Manufacturating Should be in Past")
-	private YearMonth manufacturingMonthYear;
-
-	@NotNull
-	@PastOrPresent(message = "Product Added Date Should be in Past")
-	private LocalDate productAddedDate;
+	@NotNull(message = "{Product.manufacturingMonth.invalid}")
+	private Integer manufacturingMonth;
 
 }
