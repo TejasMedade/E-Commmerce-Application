@@ -3,7 +3,6 @@
  */
 package com.masai.modelRequestDto;
 
-import javax.persistence.Column;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -28,12 +27,6 @@ public class CategoryRequestDto {
 	@NotBlank(message = "{Category.name.invalid}")
 	@Size(min = 3, message = "Category Name Should be Minimum of 3 Characters")
 	private String categoryName;
-	
-	@NotEmpty(message = "{Category.subCategory.invalid}")
-	@NotNull(message = "{Category.subCategory.invalid}")
-	@NotBlank(message = "{Category.subCategory.invalid}")
-	@Size(min = 3, message = "Sub-Catgeory Should be Minimum of 3 Characters")
-	private String subCategory;
 	
 	@NotEmpty(message = "{Category.description.invalid}")
 	@NotNull(message = "{Category.description.invalid}")
