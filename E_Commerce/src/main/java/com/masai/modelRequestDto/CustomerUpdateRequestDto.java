@@ -20,7 +20,7 @@ public class CustomerUpdateRequestDto {
 
 	private String lastName;
 
-	@Size(min = 10, max = 12, message = "{Customer.contact.invalid}")
+	@Size(max = 12, message = "{Customer.contact.invalid}")
 	private String contact;
 
 	@Email(regexp = "[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,3}", flags = Pattern.Flag.CASE_INSENSITIVE, message = "{Customer.email.invalid}")
