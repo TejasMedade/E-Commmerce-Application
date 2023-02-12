@@ -4,6 +4,12 @@
 package com.masai.modelResponseDto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Set;
+
+import org.springframework.hateoas.RepresentationModel;
+
+import com.masai.model.Image;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,9 +22,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CustomerResponseDto {
+public class CustomerResponseDto extends RepresentationModel<CustomerResponseDto> {
 
-	private Integer customerId;
+	private Integer userId;
 
 	private String firstName;
 
@@ -30,7 +36,13 @@ public class CustomerResponseDto {
 
 	private LocalDate dateOfBirth;
 
-	private LocalDate accountCreatedDate;
+	private Image image;
+
+	private LocalDateTime accountCreatedDate;
+
+	private LocalDateTime accountUpdatedDate;
+
+	private Set<RoleResponseDto> roles;
 
 	private AddressResponseDto address;
 
