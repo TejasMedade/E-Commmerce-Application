@@ -3,7 +3,10 @@
  */
 package com.masai.modelResponseDto;
 
-import java.util.List;
+import java.time.LocalDateTime;
+
+import org.springframework.hateoas.RepresentationModel;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,17 +19,17 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CategoryResponseDto {
+public class CategoryResponseDto extends RepresentationModel<CategoryResponseDto> {
 
 	private Integer categoryId;
 
 	private String categoryName;
 
-	private String subCategory;
-
 	private String categoryDescription;
 
 	private Boolean active;
 
-	private List<ProductResponseDto> listOfProducts;
+	private LocalDateTime categoryAddedDateTime;
+
+	private LocalDateTime categoryUpdatedDateTime;
 }
